@@ -26,6 +26,7 @@ Route::get('/game', [GameController::class, 'index'])->name('game.index');
 Route::middleware('auth')->group(function () {
     // Jogo
     Route::post('/game/play', [GameController::class, 'play'])->name('game.play');
+    Route::post('/game/finish', [GameController::class, 'finish'])->name('game.finish'); // NOVA ROTA
     Route::get('/game/history', [GameController::class, 'history'])->name('game.history');
     
     // Perfil do usuário (se precisar)

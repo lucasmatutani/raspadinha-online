@@ -1,56 +1,4 @@
-// Função para processar resultado do jogo após raspar tudo
-    function processGameResult() {
-        if (!gameData) return;
-
-        // Se ganhou, destacar células vencedoras e mostrar prêmio
-        if (gameData.prize > 0) {
-            highlightWinningPattern();
-            
-            // Mostrar informação do prêmio
-            const prize = parseFloat(gameData.prize);
-            prizeAmount.textContent = `R$ ${prize.toFixed(2).replace('.', ',')}`;
-            prizeInfo.style.display = 'block';
-        }
-    }    // Função para preparar as cartas com valores escondidos
-    function prepareCards() {
-        if (!gameData || !gameData.grid) return;
-
-        const displayValues = {
-            50: 'R$ 0,50',
-            100: 'R$ 1,00',
-            200: 'R$ 2,00',
-            500: 'R$ 5,00',
-            1000: 'R$ 10,00',
-            2000: 'R$ 20,00',
-            5000: 'R$ 50,00',
-            10000: 'R$ 100,00',
-            20000: 'R$ 200,00',
-            50000: 'R$ 500,00',
-            100000: 'R$ 1.000,00',
-            200000: 'R$ 2.000,00'
-        };
-
-        const cells = scratchCard.querySelectorAll('.scratch-cell');
-        cells.forEach((cell, index) => {
-            const row = Math.floor(index / 3);
-            const col = index % 3;
-            const value = gameData.grid[row][col];
-            
-            // Criar elemento para o valor escondido
-            const valueElement = document.createElement('div');
-            valueElement.className = 'cell-value';
-            valueElement.textContent = displayValues[value] || `R$ ${(value / 100).toFixed(2)}`;
-            
-            // Limpar célula e adicionar valor escondido
-            cell.innerHTML = '';
-            cell.appendChild(valueElement);
-            
-            // Reset dos estilos
-            cell.classList.remove('revealed', 'winning', 'scratching');
-            cell.style.pointerEvents = 'auto';
-            cell.style.cursor = 'pointer';
-        });
-    }<!-- resources/views/game/index.blade.php -->
+<!-- resources/views/game/index.blade.php -->
 @extends('layouts.app')
 
 @section('title', 'Raspadinha Online - Jogue Agora')
@@ -107,7 +55,7 @@
 
     .scratch-cell {
         aspect-ratio: 1;
-        background: linear-gradient(135deg, #ffffff, #f8f8f8);
+        background: linear-gradient(135deg, #00ff87, #00b359);
         border-radius: 15px;
         display: flex;
         align-items: center;
@@ -120,76 +68,43 @@
         position: relative;
         overflow: hidden;
         user-select: none;
-        border: 2px solid #ddd;
     }
 
-    .scratch-cell .cell-value {
+    .scratch-cell::before {
+        content: "💰";
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #1a1a2e;
+        font-size: 2rem;
+        opacity: 0.3;
         pointer-events: none;
     }
 
-    .scratch-cell .scratch-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
-        background-image: 
-            radial-gradient(circle at 25% 25%, rgba(255,255,255,0.4) 2px, transparent 2px),
-            radial-gradient(circle at 75% 75%, rgba(0,0,0,0.2) 1px, transparent 1px);
-        background-size: 12px 12px;
-        z-index: 2;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #666;
-        font-size: 1.5rem;
-        cursor: pointer;
-        user-select: none;
-        border-radius: 15px;
+    .scratch-cell:not(.revealed):hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 8px 20px rgba(0, 255, 135, 0.5) !important;
+        background: linear-gradient(135deg, #00ff87, #00d96b) !important;
     }
 
-    .scratch-cell .scratch-layer::before {
-        content: "💰";
-        opacity: 0.7;
+    .scratch-cell:not(.revealed):active {
+        transform: scale(0.9) !important;
+        box-shadow: 0 3px 10px rgba(0, 255, 135, 0.3) !important;
     }
 
-    .scratch-cell .scratch-layer::before {
-        content: "💰";
-        opacity: 0.7;
+    .scratch-cell.revealed {
+        background: linear-gradient(135deg, #ffffff, #f0f0f0);
+        color: #1a1a2e;
+        animation: reveal 0.5s ease;
+        cursor: default;
+        transform: none !important;
     }
 
-    .scratch-cell:not(.fully-revealed):hover .scratch-layer {
-        background: linear-gradient(135deg, #d0d0d0, #b0b0b0);
-        transform: scale(1.02);
-    }
-
-    .scratch-cell:not(.fully-revealed):active .scratch-layer {
-        transform: scale(0.98);
-    }
-
-    .scratch-cell.fully-revealed .scratch-layer {
+    .scratch-cell.revealed::before {
         display: none;
     }
 
     .scratch-cell.winning {
         background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
-        border-color: #ffb700 !important;
         animation: pulse 1.5s ease infinite;
         box-shadow: 0 0 20px rgba(255, 215, 0, 0.6) !important;
-    }
-
-    .scratch-cell.winning .cell-value {
-        color: #1a1a2e;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
 
     @keyframes reveal {
@@ -373,8 +288,8 @@
         <!-- Usuário logado - Jogo -->
         <div class="scratch-card-container">
             <div id="gameInstructions" style="display: none; background: rgba(0, 255, 135, 0.1); border: 1px solid rgba(0, 255, 135, 0.3); border-radius: 15px; padding: 1rem; margin-bottom: 1rem; text-align: center;">
-                <div style="color: #00ff87; font-weight: bold; margin-bottom: 0.5rem;">👆 Clique nos quadrados para revelar!</div>
-                <div style="color: #ccc; font-size: 0.9rem;">Clique em cada quadrado para revelar os valores. Encontre 3 símbolos iguais para ganhar!</div>
+                <div style="color: #00ff87; font-weight: bold; margin-bottom: 0.5rem;">👆 Clique nos quadrados para raspar!</div>
+                <div style="color: #ccc; font-size: 0.9rem;">Encontre 3 símbolos iguais para ganhar o prêmio</div>
             </div>
 
             <div class="prize-info" id="prizeInfo" style="display: none;">
@@ -447,7 +362,6 @@
     let isPlaying = false;
     let revealedCells = 0;
     let totalCells = 9;
-    let gameId = null; // ID do jogo atual
 
     // Elementos DOM
     const playButton = document.getElementById('playButton');
@@ -470,18 +384,11 @@
     });
 
     // Event listeners para as células (raspar)
-    scratchCard.addEventListener('mousedown', startScratch);
-    scratchCard.addEventListener('mousemove', scratch);
-    scratchCard.addEventListener('mouseup', stopScratch);
-    scratchCard.addEventListener('mouseleave', stopScratch);
-    
-    // Touch events para mobile
-    scratchCard.addEventListener('touchstart', startScratchTouch);
-    scratchCard.addEventListener('touchmove', scratchTouch);
-    scratchCard.addEventListener('touchend', stopScratch);
-
-    let isScratching = false;
-    let scratchedCells = new Set();
+    scratchCard.addEventListener('click', (e) => {
+        if (e.target.classList.contains('scratch-cell') && gameData && !e.target.classList.contains('revealed')) {
+            revealCell(e.target);
+        }
+    });
 
     function startGame() {
         isPlaying = true;
@@ -516,15 +423,13 @@
             
             if (data.success) {
                 gameData = data.card;
-                // Atualizar saldo imediatamente (já foi debitado no backend)
-                currentBalance = parseFloat(data.card.new_balance);
-                updateBalance(currentBalance);
+                currentBalance = data.new_balance;
                 
                 // Debug: verificar se gameData foi recebido corretamente
                 console.log('GameData recebido:', gameData);
                 
-                // Preparar as células com os valores escondidos
-                prepareCards();
+                // Atualizar saldo na interface
+                updateBalance(currentBalance);
                 
                 // Habilitar as células para clique
                 playButton.textContent = '🎮 Raspe os Quadrados!';
@@ -581,101 +486,116 @@
             return;
         }
 
-        // Começar animação de raspagem
-        cell.classList.add('scratching');
-        cell.style.pointerEvents = 'none';
+        const pos = cell.getAttribute('data-pos').split(',');
+        const row = parseInt(pos[0]);
+        const col = parseInt(pos[1]);
+        const value = gameData.grid[row][col];
         
-        // Após a animação, revelar o valor
+        // Valores para display
+        const displayValues = {
+            50: 'R$ 0,50',
+            100: 'R$ 1,00',
+            200: 'R$ 2,00',
+            500: 'R$ 5,00',
+            1000: 'R$ 10,00',
+            2000: 'R$ 20,00',
+            5000: 'R$ 50,00',
+            10000: 'R$ 100,00',
+            20000: 'R$ 200,00',
+            50000: 'R$ 500,00',
+            100000: 'R$ 1.000,00',
+            200000: 'R$ 2.000,00'
+        };
+        
+        // Efeito de raspagem
+        cell.style.transform = 'scale(0.95)';
         setTimeout(() => {
-            cell.classList.remove('scratching');
+            cell.textContent = displayValues[value] || `R$ ${(value / 100).toFixed(2)}`;
             cell.classList.add('revealed');
+            cell.style.transform = 'scale(1)';
+            cell.style.pointerEvents = 'none';
+            cell.style.cursor = 'default';
+            
+            // Verificar se é célula vencedora
+            if (gameData.prize > 0 && gameData.winning_value && value == gameData.winning_value) {
+                setTimeout(() => {
+                    cell.classList.add('winning');
+                }, 300);
+            }
             
             revealedCells++;
             
             // Verificar se todas as células foram reveladas
             if (revealedCells >= totalCells) {
                 setTimeout(() => {
-                    // Agora sim, processar o resultado e atualizar saldo
-                    processGameResult();
                     finishGame();
-                }, 300);
-            }
-        }, 800); // Tempo da animação de raspagem
-    }
-
-    // Função para finalizar o jogo no servidor
-    function finishGameOnServer() {
-        if (!gameId) {
-            console.error('Game ID não encontrado');
-            return;
-        }
-
-        fetch('{{ route("game.finish") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': window.csrfToken,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                game_id: gameId
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Agora temos as informações completas do resultado
-                gameData.prize = data.prize;
-                gameData.win_type = data.win_type;
-                gameData.winning_value = data.winning_value;
-                gameData.is_winner = data.is_winner;
-                
-                // Atualizar saldo se ganhou
-                if (data.new_balance) {
-                    currentBalance = data.new_balance;
-                    updateBalance(currentBalance);
-                }
-                
-                // Processar resultado visual
-                processGameResult();
-                finishGame();
+                }, 500);
             } else {
-                console.error('Erro ao finalizar jogo:', data.error);
-                alert('Erro ao processar resultado do jogo');
-                resetGame();
+                // Verificar se já pode determinar vitória/derrota
+                checkEarlyWin();
             }
-        })
-        .catch(error => {
-            console.error('Erro na requisição:', error);
-            alert('Erro de conexão ao finalizar jogo');
-            resetGame();
-        });
+        }, 100);
     }
 
-    // Função para processar resultado visual
-    function processGameResult() {
-        if (!gameData || !gameData.is_winner) return;
+    function checkEarlyWin() {
+        // Verificar se gameData existe
+        if (!gameData) return;
 
-        // Destacar células vencedoras
-        highlightWinningPattern();
+        // Se já sabemos que ganhou e revelamos as células vencedoras, podemos mostrar o resultado
+        if (gameData.prize > 0) {
+            const revealedWinningCells = countRevealedWinningCells();
+            
+            // Para 3 símbolos iguais, se revelamos pelo menos 3 células vencedoras
+            if (gameData.win_type === 'three_same' && revealedWinningCells >= 3) {
+                highlightWinningPattern();
+            }
+            // Para linhas/colunas/diagonais, verificar padrões específicos
+            else if (checkWinningPatternRevealed()) {
+                highlightWinningPattern();
+            }
+        }
+    }
+
+    function countRevealedWinningCells() {
+        // Verificar se gameData existe
+        if (!gameData || !gameData.grid) return 0;
+
+        const cells = scratchCard.querySelectorAll('.scratch-cell.revealed');
+        let count = 0;
         
-        // Mostrar informação do prêmio
-        const prize = parseFloat(gameData.prize);
-        prizeAmount.textContent = `R$ ${prize.toFixed(2).replace('.', ',')}`;
-        prizeInfo.style.display = 'block';
+        cells.forEach(cell => {
+            const pos = cell.getAttribute('data-pos').split(',');
+            const row = parseInt(pos[0]);
+            const col = parseInt(pos[1]);
+            const value = gameData.grid[row][col];
+            
+            if (gameData.winning_value && value == gameData.winning_value) {
+                count++;
+            }
+        });
+        
+        return count;
+    }
+
+    function checkWinningPatternRevealed() {
+        // Implementar verificação para padrões específicos se necessário
+        // Por enquanto, retorna false para manter simples
+        return false;
     }
 
     function highlightWinningPattern() {
-        if (!gameData || !gameData.grid || !gameData.winning_value) return;
+        // Verificar se gameData existe
+        if (!gameData || !gameData.grid) return;
 
         // Destacar todas as células vencedoras
         const cells = scratchCard.querySelectorAll('.scratch-cell');
-        cells.forEach((cell, index) => {
-            const row = Math.floor(index / 3);
-            const col = index % 3;
+        cells.forEach(cell => {
+            const pos = cell.getAttribute('data-pos').split(',');
+            const row = parseInt(pos[0]);
+            const col = parseInt(pos[1]);
             const value = gameData.grid[row][col];
             
-            if (value == gameData.winning_value) {
+            if (gameData.winning_value && value == gameData.winning_value) {
                 cell.classList.add('winning');
             }
         });
@@ -693,10 +613,17 @@
         }
 
         if (gameData.prize > 0) {
+            // Garantir que o prize seja um número
+            const prize = parseFloat(gameData.prize);
+            prizeAmount.textContent = `R$ ${prize.toFixed(2).replace('.', ',')}`;
+            prizeInfo.style.display = 'block';
+            
+            // Destacar todas as células vencedoras
+            highlightWinningPattern();
+            
             // Mostrar modal de vitória com delay para ver o efeito
             setTimeout(() => {
                 const winType = gameData.win_type || 'three_same';
-                const prize = parseFloat(gameData.prize);
                 console.log('Showing win modal with:', winType, prize);
                 showWinModal(winType, prize);
             }, 1000);
@@ -716,23 +643,6 @@
         setTimeout(() => {
             resetGame();
         }, 2000);
-    }
-
-    function highlightWinningPattern() {
-        // Verificar se gameData existe
-        if (!gameData || !gameData.grid) return;
-
-        // Destacar todas as células vencedoras
-        const cells = scratchCard.querySelectorAll('.scratch-cell');
-        cells.forEach((cell, index) => {
-            const row = Math.floor(index / 3);
-            const col = index % 3;
-            const value = gameData.grid[row][col];
-            
-            if (gameData.winning_value && value == gameData.winning_value) {
-                cell.classList.add('winning');
-            }
-        });
     }
 
     function resetGame() {
