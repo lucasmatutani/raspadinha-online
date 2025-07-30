@@ -16,7 +16,7 @@
             font-weight: 900;
             background: linear-gradient(135deg, #00ff87, #ffffff, #00ff87);
             background-size: 200% 200%;
-            -webkit-background-clip: text;
+            -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent;
             animation: gradient 3s ease infinite;
             margin-bottom: 1rem;
@@ -428,6 +428,9 @@
                 prizeInfo.style.display = 'none';
                 revealedCells = 0;
 
+                balanceGame = currentBalance - 5;
+                updateBalance(balanceGame);
+
                 // Reset das células
                 const cells = scratchCard.querySelectorAll('.scratch-cell');
                 cells.forEach(cell => {
@@ -455,12 +458,6 @@
                             gameData = data.card;
                             currentBalance = data.new_balance;
 
-                            // Debug: verificar se gameData foi recebido corretamente
-                            console.log('GameData recebido:', gameData);
-
-                            // Atualizar saldo na interface
-                            updateBalance(currentBalance);
-
                             // Habilitar as células para clique
                             playButton.textContent = '🎮 Raspe os Quadrados!';
                             playButton.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
@@ -479,6 +476,31 @@
                         alert('Erro de conexão. Tente novamente.');
                         resetGame();
                     });
+            }
+
+            // Função para atualizar saldo com efeito visual
+            function updateBalance(newBalance) {
+                const balanceElement = document.getElementById('balance');
+                if (balanceElement) {
+                    // Converter para número antes de usar toFixed
+                    const balance = parseFloat(newBalance);
+                    const newText = 'R$ ' + balance.toFixed(2).replace('.', ',');
+                    
+                    // Efeito de atualização
+                    balanceElement.style.transform = 'scale(1.1)';
+                    balanceElement.style.background = 'linear-gradient(135deg, #ffd700, #ffed4e)';
+                    balanceElement.style.color = '#1a1a2e';
+                    
+                    setTimeout(() => {
+                        balanceElement.textContent = newText;
+                        
+                        setTimeout(() => {
+                            balanceElement.style.transform = 'scale(1)';
+                            balanceElement.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
+                            balanceElement.style.color = '#1a1a2e';
+                        }, 300);
+                    }, 200);
+                }
             }
 
             function showInstruction() {
@@ -625,9 +647,6 @@
             }
 
             function finishGame() {
-                // Debug: verificar gameData
-                console.log('finishGame - gameData:', gameData);
-
                 // Verificar se gameData existe antes de usar
                 if (!gameData) {
                     console.error('gameData is null in finishGame');
@@ -639,6 +658,9 @@
                     // AGORA SIM: Destacar células vencedoras apenas no final
                     highlightWinningPattern();
 
+                    // Atualizar saldo na interface
+                    updateBalance(currentBalance);
+
                     // Garantir que o prize seja um número
                     const prize = parseFloat(gameData.prize);
                     prizeAmount.textContent = `R$ ${prize.toFixed(2).replace('.', ',')}`;
@@ -647,7 +669,6 @@
                     // Mostrar modal de vitória com delay para ver o efeito
                     setTimeout(() => {
                         const winType = gameData.win_type || 'three_same';
-                        console.log('Showing win modal with:', winType, prize);
                         showWinModal(winType, prize);
                     }, 1000);
                 } else {

@@ -315,31 +315,6 @@
             closeDepositModal();
         });
 
-        // Função para atualizar saldo com efeito visual
-        function updateBalance(newBalance) {
-            const balanceElement = document.getElementById('balance');
-            if (balanceElement) {
-                // Converter para número antes de usar toFixed
-                const balance = parseFloat(newBalance);
-                const newText = 'R$ ' + balance.toFixed(2).replace('.', ',');
-                
-                // Efeito de atualização
-                balanceElement.style.transform = 'scale(1.1)';
-                balanceElement.style.background = 'linear-gradient(135deg, #ffd700, #ffed4e)';
-                balanceElement.style.color = '#1a1a2e';
-                
-                setTimeout(() => {
-                    balanceElement.textContent = newText;
-                    
-                    setTimeout(() => {
-                        balanceElement.style.transform = 'scale(1)';
-                        balanceElement.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
-                        balanceElement.style.color = '#1a1a2e';
-                    }, 300);
-                }, 200);
-            }
-        }
-
         // Função para mostrar modal de vitória
         function showWinModal(winType, amount) {
             const winMessages = {

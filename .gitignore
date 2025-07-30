@@ -103,7 +103,7 @@ composer.phar
 .env.testing
 
 # Cache
-/bootstrap/cache/
-/storage/framework/cache/
-/storage/framework/sessions/
-/storage/framework/views/
+/bootstrap/cache/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
