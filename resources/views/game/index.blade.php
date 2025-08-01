@@ -296,7 +296,7 @@
     <div class="container">
         <!-- Game Section -->
         <section class="game-section">
-            <h1 class="game-title">RASPETAQUI!</h1>
+            <h1 class="game-title">RASPE AQUI!</h1>
             <p class="game-subtitle">
                 Raspe e revele os prêmios escondidos.<br>
                 3 símbolos iguais e você ganha o valor!
@@ -351,7 +351,7 @@
             @endguest
 
             <!-- Money Cards Display -->
-            <div class="money-cards">
+            {{-- <div class="money-cards">
                 <div class="money-card">R$ 0,50</div>
                 <div class="money-card">R$ 1,00</div>
                 <div class="money-card">R$ 2,00</div>
@@ -364,7 +364,7 @@
                 <div class="money-card">R$ 500,00</div>
                 <div class="money-card">R$ 1.000</div>
                 <div class="money-card">R$ 2.000</div>
-            </div>
+            </div> --}}
 
             <!-- Instructions -->
             <div class="instructions">
