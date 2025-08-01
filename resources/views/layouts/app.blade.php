@@ -211,7 +211,7 @@
     <!-- Header -->
     <header class="header">
         <a href="{{ route('game.index') }}" class="logo">
-            Raspadinha Online
+            RaspaKing
         </a>
         
         @auth
