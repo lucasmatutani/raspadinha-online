@@ -98,11 +98,19 @@
         }
 
         .scratch-cell.revealed {
-            background: linear-gradient(135deg, #ffffff, #f0f0f0);
-            color: #1a1a2e;
+            background: linear-gradient(145deg, #1a1a2e, #2a2a3e);
+            color: #00ff87;
+            border: 2px solid rgba(0, 255, 135, 0.5);
             animation: reveal 0.5s ease;
             cursor: default;
             transform: none !important;
+            font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(0, 255, 135, 0.8);
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 255, 135, 0.2),
+                0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
         .scratch-cell.revealed::before {
@@ -110,20 +118,49 @@
         }
 
         .scratch-cell.winning {
-            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
-            animation: pulse 1.5s ease infinite;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6) !important;
+            background: linear-gradient(145deg, #2a1810, #3a2415) !important;
+            color: #ffd700 !important;
+            border: 2px solid #ffd700 !important;
+            animation: pulse 1.5s ease infinite, winningGlow 2s ease-in-out infinite;
+            box-shadow: 
+                inset 0 2px 4px rgba(255, 215, 0, 0.3),
+                0 0 20px rgba(255, 215, 0, 0.6),
+                0 4px 12px rgba(0, 0, 0, 0.4) !important;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 1) !important;
+            font-weight: 900 !important;
+            font-size: 1.3rem !important;
+        }
+
+        @keyframes winningGlow {
+            0%, 100% {
+                box-shadow: 
+                    inset 0 2px 4px rgba(255, 215, 0, 0.3),
+                    0 0 20px rgba(255, 215, 0, 0.6),
+                    0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 2px 4px rgba(255, 215, 0, 0.5),
+                    0 0 30px rgba(255, 215, 0, 0.9),
+                    0 4px 12px rgba(0, 0, 0, 0.4);
+            }
         }
 
         @keyframes reveal {
             from {
                 transform: scale(0.8);
                 opacity: 0;
+                filter: blur(5px);
             }
-
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+                filter: blur(2px);
+            }
             to {
                 transform: scale(1);
                 opacity: 1;
+                filter: blur(0px);
             }
         }
 
@@ -350,22 +387,6 @@
                 </div>
             @endguest
 
-            <!-- Money Cards Display -->
-            {{-- <div class="money-cards">
-                <div class="money-card">R$ 0,50</div>
-                <div class="money-card">R$ 1,00</div>
-                <div class="money-card">R$ 2,00</div>
-                <div class="money-card">R$ 5,00</div>
-                <div class="money-card">R$ 10,00</div>
-                <div class="money-card">R$ 20,00</div>
-                <div class="money-card">R$ 50,00</div>
-                <div class="money-card">R$ 100,00</div>
-                <div class="money-card">R$ 200,00</div>
-                <div class="money-card">R$ 500,00</div>
-                <div class="money-card">R$ 1.000</div>
-                <div class="money-card">R$ 2.000</div>
-            </div> --}}
-
             <!-- Instructions -->
             <div class="instructions">
                 <h3>CONTEÚDO DESSA RASPADINHA:</h3>
@@ -379,6 +400,34 @@
                 </ul>
             </div>
         </section>
+    </div>
+
+    <!-- Modal de Vitória -->
+    <div id="winModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; backdrop-filter: blur(5px);">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(145deg, #2a2a3e, #1a1a2e); padding: 3rem; border-radius: 20px; border: 3px solid #ffd700; box-shadow: 0 0 50px rgba(255, 215, 0, 0.5); max-width: 500px; text-align: center; z-index: 2001;">
+            <div style="font-size: 6rem; margin-bottom: 1rem; animation: bounce 1s ease infinite;">🎉</div>
+            <h2 style="color: #ffd700; margin-bottom: 1rem; font-size: 2.5rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);">PARABÉNS!</h2>
+            <div id="winType" style="color: #00ff87; font-size: 1.3rem; margin-bottom: 1rem; font-weight: bold;"></div>
+            <div style="color: #ffffff; font-size: 1.2rem; margin-bottom: 1rem;">Você ganhou:</div>
+            <div id="winAmount" style="color: #ffd700; font-size: 3rem; font-weight: bold; margin-bottom: 2rem; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);"></div>
+            <button class="btn btn-primary" onclick="closeWinModal()" style="padding: 1rem 3rem; font-size: 1.3rem; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #1a1a2e;">
+                Continuar Jogando 🎰
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Derrota -->
+    <div id="loseModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; backdrop-filter: blur(5px);">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(145deg, #2a2a3e, #1a1a2e); padding: 3rem; border-radius: 20px; border: 3px solid #ff6b6b; box-shadow: 0 0 50px rgba(255, 107, 107, 0.5); max-width: 500px; text-align: center; z-index: 2001;">
+            <div style="font-size: 6rem; margin-bottom: 1rem; animation: shake 1s ease infinite;">😔</div>
+            <h2 style="color: #ff6b6b; margin-bottom: 1rem; font-size: 2.5rem; text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);">QUE PENA!</h2>
+            <div style="color: #cccccc; font-size: 1.3rem; margin-bottom: 1rem; font-weight: bold;">Não foi dessa vez...</div>
+            <div style="color: #ffffff; font-size: 1.2rem; margin-bottom: 1rem;">Mas não desista!</div>
+            <div style="color: #ff6b6b; font-size: 1.5rem; font-weight: bold; margin-bottom: 2rem;">A próxima pode ser a sua! 🍀</div>
+            <button class="btn btn-primary" onclick="closeLoseModal()" style="padding: 1rem 3rem; font-size: 1.3rem; background: linear-gradient(135deg, #00ff87, #00b359); color: #1a1a2e;">
+                Tentar Novamente 🎯
+            </button>
+        </div>
     </div>
 @endsection
 
@@ -481,54 +530,30 @@
             // Função para atualizar saldo com efeito visual
             function updateBalance(newBalance) {
                 const balanceElement = document.getElementById('balance');
-                if (balanceElement) {
-                    // Converter para número antes de usar toFixed
-                    const balance = parseFloat(newBalance);
-                    const newText = 'R$ ' + balance.toFixed(2).replace('.', ',');
-                    
-                    // Efeito de atualização
-                    balanceElement.style.transform = 'scale(1.1)';
-                    balanceElement.style.background = 'linear-gradient(135deg, #ffd700, #ffed4e)';
-                    balanceElement.style.color = '#1a1a2e';
-                    
-                    setTimeout(() => {
-                        balanceElement.textContent = newText;
+                const balanceMobileElement = document.getElementById('balance-mobile');
+                
+                [balanceElement, balanceMobileElement].forEach(element => {
+                    if (element) {
+                        // Converter para número antes de usar toFixed
+                        const balance = parseFloat(newBalance);
+                        const newText = 'R$ ' + balance.toFixed(2).replace('.', ',');
+                        
+                        // Efeito de atualização
+                        element.style.transform = 'scale(1.1)';
+                        element.style.background = 'linear-gradient(135deg, #ffd700, #ffed4e)';
+                        element.style.color = '#1a1a2e';
                         
                         setTimeout(() => {
-                            balanceElement.style.transform = 'scale(1)';
-                            balanceElement.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
-                            balanceElement.style.color = '#1a1a2e';
-                        }, 300);
-                    }, 200);
-                }
-            }
-
-            function showInstruction() {
-                // Criar overlay de instrução temporário
-                const instruction = document.createElement('div');
-                instruction.innerHTML = `
-                    <div style="
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background: rgba(0, 255, 135, 0.95);
-                        color: #1a1a2e;
-                        padding: 1rem 2rem;
-                        border-radius: 15px;
-                        font-weight: bold;
-                        font-size: 1.2rem;
-                        z-index: 1000;
-                        animation: pulse 0.5s ease;
-                    ">
-                        👆 Clique nos quadrados para raspar!
-                    </div>
-                `;
-                document.body.appendChild(instruction);
-
-                setTimeout(() => {
-                    instruction.remove();
-                }, 2000);
+                            element.textContent = newText;
+                            
+                            setTimeout(() => {
+                                element.style.transform = 'scale(1)';
+                                element.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
+                                element.style.color = '#1a1a2e';
+                            }, 300);
+                        }, 200);
+                    }
+                });
             }
 
             function revealCell(cell) {
@@ -543,32 +568,32 @@
                 const col = parseInt(pos[1]);
                 const value = gameData.grid[row][col];
 
-                // Valores para display
+                // Valores para display com símbolos modernos
                 const displayValues = {
-                    50: 'R$ 0,50',
-                    100: 'R$ 1,00',
-                    200: 'R$ 2,00',
-                    500: 'R$ 5,00',
-                    1000: 'R$ 10,00',
-                    2000: 'R$ 20,00',
-                    5000: 'R$ 50,00',
-                    10000: 'R$ 100,00',
-                    20000: 'R$ 200,00',
-                    50000: 'R$ 500,00',
-                    100000: 'R$ 1.000,00',
-                    200000: 'R$ 2.000,00'
+                    50: '$ 0.50',
+                    100: '$ 1.00',
+                    200: '$ 2.00',
+                    500: '$ 5.00',
+                    1000: '$ 10.00',
+                    2000: '$ 20.00',
+                    5000: '$ 50.00',
+                    10000: '$ 100',
+                    20000: '$ 200',
+                    50000: '$ 500',
+                    100000: '$ 1K',
+                    200000: '$ 2K'
                 };
 
-                // Efeito de raspagem
+                // Efeito de raspagem mais suave
                 cell.style.transform = 'scale(0.95)';
+                cell.style.filter = 'blur(3px)';
                 setTimeout(() => {
-                    cell.textContent = displayValues[value] || `R$ ${(value / 100).toFixed(2)}`;
+                    cell.textContent = displayValues[value] || `$ ${(value / 100).toFixed(2)}`;
                     cell.classList.add('revealed');
                     cell.style.transform = 'scale(1)';
+                    cell.style.filter = 'blur(0px)';
                     cell.style.pointerEvents = 'none';
                     cell.style.cursor = 'default';
-
-                    // REMOVIDO: Não destacar células vencedoras ainda
 
                     revealedCells++;
 
@@ -578,54 +603,7 @@
                             finishGame();
                         }, 500);
                     }
-                    // REMOVIDO: checkEarlyWin() - não verificar vitória antes do fim
-                }, 100);
-            }
-
-            function checkEarlyWin() {
-                // Verificar se gameData existe
-                if (!gameData) return;
-
-                // Se já sabemos que ganhou e revelamos as células vencedoras, podemos mostrar o resultado
-                if (gameData.prize > 0) {
-                    const revealedWinningCells = countRevealedWinningCells();
-
-                    // Para 3 símbolos iguais, se revelamos pelo menos 3 células vencedoras
-                    if (gameData.win_type === 'three_same' && revealedWinningCells >= 3) {
-                        highlightWinningPattern();
-                    }
-                    // Para linhas/colunas/diagonais, verificar padrões específicos
-                    else if (checkWinningPatternRevealed()) {
-                        highlightWinningPattern();
-                    }
-                }
-            }
-
-            function countRevealedWinningCells() {
-                // Verificar se gameData existe
-                if (!gameData || !gameData.grid) return 0;
-
-                const cells = scratchCard.querySelectorAll('.scratch-cell.revealed');
-                let count = 0;
-
-                cells.forEach(cell => {
-                    const pos = cell.getAttribute('data-pos').split(',');
-                    const row = parseInt(pos[0]);
-                    const col = parseInt(pos[1]);
-                    const value = gameData.grid[row][col];
-
-                    if (gameData.winning_value && value == gameData.winning_value) {
-                        count++;
-                    }
-                });
-
-                return count;
-            }
-
-            function checkWinningPatternRevealed() {
-                // Implementar verificação para padrões específicos se necessário
-                // Por enquanto, retorna false para manter simples
-                return false;
+                }, 300);
             }
 
             function highlightWinningPattern() {
@@ -655,7 +633,7 @@
                 }
 
                 if (gameData.prize > 0) {
-                    // AGORA SIM: Destacar células vencedoras apenas no final
+                    // Destacar células vencedoras
                     highlightWinningPattern();
 
                     // Atualizar saldo na interface
@@ -666,14 +644,19 @@
                     prizeAmount.textContent = `R$ ${prize.toFixed(2).replace('.', ',')}`;
                     prizeInfo.style.display = 'block';
 
-                    // Mostrar modal de vitória com delay para ver o efeito
+                    // Mostrar modal de vitória com delay
                     setTimeout(() => {
                         const winType = gameData.win_type || 'three_same';
                         showWinModal(winType, prize);
                     }, 1000);
-                } 
+                } else {
+                    // Mostrar modal de derrota
+                    setTimeout(() => {
+                        showLoseModal();
+                    }, 1000);
+                }
                 
-                // Aguardar um pouco antes de resetar para permitir que o modal apareça
+                // Aguardar antes de resetar
                 setTimeout(() => {
                     resetGame();
                 }, 2000);
@@ -689,9 +672,167 @@
                 gameInstructions.style.display = 'none';
             }
 
-            // CSS para animação adicional
-            const style = document.createElement('style');
-            style.textContent = `
+            // Função para mostrar modal de vitória
+            function showWinModal(winType, amount) {
+                const winMessages = {
+                    'three_same': '3 Símbolos Iguais!',
+                    'horizontal_line': 'Linha Completa!',
+                    'vertical_line': 'Coluna Completa!',
+                    'diagonal': 'Diagonal Completa!',
+                    'corners': '4 Cantos Iguais!'
+                };
+
+                document.getElementById('winType').textContent = winMessages[winType] || 'Você Ganhou!';
+                document.getElementById('winAmount').textContent = `R$ ${amount.toFixed(2).replace('.', ',')}`;
+                document.getElementById('winModal').style.display = 'block';
+                
+                // Efeito de fogos de artifício
+                setTimeout(() => {
+                    createFireworks();
+                }, 500);
+            }
+
+            function closeWinModal() {
+                document.getElementById('winModal').style.display = 'none';
+            }
+
+            // Função para mostrar modal de derrota
+            function showLoseModal() {
+                document.getElementById('loseModal').style.display = 'block';
+                
+                // Efeito de chuva de lágrimas
+                setTimeout(() => {
+                    createRaindrops();
+                }, 500);
+            }
+
+            function closeLoseModal() {
+                document.getElementById('loseModal').style.display = 'none';
+            }
+
+            // Efeito de fogos de artifício para vitórias
+            function createFireworks() {
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
+                
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const firework = document.createElement('div');
+                        firework.style.cssText = `
+                            position: fixed;
+                            top: ${Math.random() * 50 + 20}%;
+                            left: ${Math.random() * 80 + 10}%;
+                            width: 6px;
+                            height: 6px;
+                            background: ${colors[Math.floor(Math.random() * colors.length)]};
+                            border-radius: 50%;
+                            z-index: 3000;
+                            pointer-events: none;
+                            animation: fireworkExplode 1.5s ease-out forwards;
+                        `;
+                        document.body.appendChild(firework);
+                        
+                        setTimeout(() => firework.remove(), 1500);
+                    }, i * 100);
+                }
+            }
+
+            // Efeito de chuva de lágrimas para derrota
+            function createRaindrops() {
+                const colors = ['#87ceeb', '#4682b4', '#6495ed', '#b0c4de', '#add8e6', '#e0f6ff', '#b8e6f0'];
+                
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const raindrop = document.createElement('div');
+                        raindrop.style.cssText = `
+                            position: fixed;
+                            top: -10px;
+                            left: ${Math.random() * 100}%;
+                            width: 3px;
+                            height: ${Math.random() * 20 + 10}px;
+                            background: ${colors[Math.floor(Math.random() * colors.length)]};
+                            border-radius: 50%;
+                            z-index: 3000;
+                            pointer-events: none;
+                            animation: raindropFall 2s linear forwards;
+                            opacity: 0.7;
+                        `;
+                        document.body.appendChild(raindrop);
+                        
+                        setTimeout(() => raindrop.remove(), 2000);
+                    }, i * 100);
+                }
+            }
+
+            // Fechar modais clicando fora ou com ESC
+            window.addEventListener('click', function(e) {
+                if (e.target.id === 'winModal') {
+                    closeWinModal();
+                }
+                if (e.target.id === 'loseModal') {
+                    closeLoseModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeWinModal();
+                    closeLoseModal();
+                }
+            });
+
+            // CSS para animações dos efeitos visuais
+            const effectsStyle = document.createElement('style');
+            effectsStyle.textContent = `
+                @keyframes bounce {
+                    0%, 20%, 50%, 80%, 100% {
+                        transform: translateY(0);
+                    }
+                    40% {
+                        transform: translateY(-10px);
+                    }
+                    60% {
+                        transform: translateY(-5px);
+                    }
+                }
+
+                @keyframes shake {
+                    0%, 100% { 
+                        transform: translateX(0); 
+                    }
+                    10%, 30%, 50%, 70%, 90% { 
+                        transform: translateX(-5px); 
+                    }
+                    20%, 40%, 60%, 80% { 
+                        transform: translateX(5px); 
+                    }
+                }
+
+                @keyframes fireworkExplode {
+                    0% {
+                        transform: scale(0);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: scale(8);
+                        opacity: 0.8;
+                    }
+                    100% {
+                        transform: scale(12);
+                        opacity: 0;
+                    }
+                }
+
+                @keyframes raindropFall {
+                    0% {
+                        transform: translateY(-10px);
+                        opacity: 0.7;
+                    }
+                    100% {
+                        transform: translateY(100vh);
+                        opacity: 0;
+                    }
+                }
+
                 .scratch-cell {
                     position: relative;
                     overflow: hidden;
@@ -710,7 +851,7 @@
                     transform: scale(0.95) !important;
                 }
             `;
-            document.head.appendChild(style);
+            document.head.appendChild(effectsStyle);
         </script>
     @endpush
 @endauth

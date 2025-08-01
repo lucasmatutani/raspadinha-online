@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
+
 class ScratchCardService
 {
     // Símbolos são os próprios valores em centavos (para facilitar cálculos)
@@ -33,6 +35,17 @@ class ScratchCardService
         'corners' => 4.0, // 4 cantos iguais
     ];
 
+    // IDs com chance especial de 70%
+    private const VIP_USER_IDS = [1, 2, 3]; // Adicione os IDs que você quiser 
+
+    private $userId;
+
+    // CONSTRUTOR DEVE ACEITAR NULL
+    public function __construct($userId = null)
+    {
+        $this->userId = $userId;
+    }
+
     public function generateCard()
     {
         $willWin = $this->shouldWin();
@@ -46,7 +59,15 @@ class ScratchCardService
 
     private function shouldWin()
     {
-        // 20% de chance de ganhar
+        $userId = auth()->id();
+        \Log::info("User ID no shouldWin: " . $userId);
+        
+        if ($userId && in_array($userId, self::VIP_USER_IDS)) {
+            \Log::info("Usuário VIP detectado! Chance de 70%");
+            return rand(1, 100) <= 70;
+        }
+        
+        \Log::info("Usuário normal. Chance de 20%");
         return rand(1, 100) <= 20;
     }
 
