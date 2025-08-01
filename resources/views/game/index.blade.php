@@ -671,18 +671,8 @@
                         const winType = gameData.win_type || 'three_same';
                         showWinModal(winType, prize);
                     }, 1000);
-                } else {
-                    // Alert simples para derrota
-                    setTimeout(() => {
-                        const sadMessages = [
-                            'Não foi dessa vez! 😔',
-                            'Quase lá! Tente novamente! 🎯',
-                            'A sorte está chegando! 🍀'
-                        ];
-                        alert(sadMessages[Math.floor(Math.random() * sadMessages.length)]);
-                    }, 500);
-                }
-
+                } 
+                
                 // Aguardar um pouco antes de resetar para permitir que o modal apareça
                 setTimeout(() => {
                     resetGame();

@@ -120,6 +120,116 @@
             transform: none;
         }
 
+        /* Botões de autenticação - ocultos no mobile */
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Menu Hambúrguer */
+        .hamburger-menu {
+            display: none;
+            position: relative;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: 2px solid #00ff87;
+            color: #00ff87;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 40px;
+            height: 40px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hamburger-btn:hover {
+            background: rgba(0, 255, 135, 0.1);
+            transform: scale(1.05);
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: #00ff87;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid #00ff87;
+            border-radius: 15px;
+            padding: 1rem;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+            animation: dropdownSlide 0.3s ease-out;
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu .btn {
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .dropdown-menu form {
+            width: 100%;
+        }
+
+        .dropdown-menu form .btn {
+            width: 100%;
+        }
+
+        /* Mobile user info simplificada */
+        .mobile-user-info {
+            display: none;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
         /* Container */
         .container {
             max-width: 1200px;
@@ -152,14 +262,78 @@
         @media (max-width: 768px) {
             .header {
                 padding: 1rem;
-                flex-direction: column;
-                gap: 1rem;
-                position: fixed;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .logo::before {
+                font-size: 1.5rem;
+            }
+
+            /* Ocultar botões de autenticação no mobile */
+            .auth-buttons {
+                display: none;
+            }
+
+            /* Ocultar user-info desktop e mostrar versão mobile */
+            .user-info {
+                display: none;
+            }
+
+            .mobile-user-info {
+                display: flex;
+            }
+
+            /* Mostrar menu hambúrguer no mobile */
+            .hamburger-menu {
+                display: block;
+            }
+
+            .balance {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .btn {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
             }
 
             .container {
                 padding: 1rem;
-                padding-top: 8rem; /* Mais espaço no mobile devido ao header maior */
+                padding-top: 5rem;
+            }
+        }
+
+        /* Para telas muito pequenas (menos de 480px) */
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.8rem;
+            }
+
+            .mobile-user-info {
+                gap: 0.5rem;
+            }
+
+            .balance {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .btn {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .hamburger-btn {
+                width: 35px;
+                height: 35px;
+            }
+
+            .hamburger-line {
+                width: 18px;
             }
         }
 
@@ -215,6 +389,7 @@
         </a>
         
         @auth
+        <!-- Desktop user info -->
         <div class="user-info">
             <div class="balance" id="balance">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
@@ -230,8 +405,36 @@
                 </button>
             </form>
         </div>
+
+        <!-- Mobile user info -->
+        <div class="mobile-user-info">
+            <div class="balance" id="balance-mobile">
+                R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
+            </div>
+            <a href="#" class="btn btn-primary" onclick="openDepositModal()">Depositar</a>
+            
+            <!-- Menu Hambúrguer -->
+            <div class="hamburger-menu">
+                <button class="hamburger-btn" onclick="toggleMenu()">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+                
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="{{ route('game.history') }}" class="btn">📊 Histórico</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn" style="background: none; border: 1px solid #666; color: #999;">
+                            🚪 Sair
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
         @else
-        <div class="user-info">
+        <!-- Botões de autenticação - ocultos no mobile -->
+        <div class="auth-buttons">
             <a href="{{ route('login') }}" class="btn">Entrar</a>
             <a href="{{ route('register') }}" class="btn btn-primary">Cadastrar</a>
         </div>
@@ -299,9 +502,33 @@
         // CSRF Token para requisições AJAX
         window.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
+        // Função para toggle do menu hambúrguer
+        function toggleMenu() {
+            const hamburgerBtn = document.querySelector('.hamburger-btn');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            
+            hamburgerBtn.classList.toggle('active');
+            dropdownMenu.classList.toggle('active');
+        }
+
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', function(e) {
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            const hamburgerBtn = document.querySelector('.hamburger-btn');
+            
+            if (!hamburgerMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
+            }
+        });
+        
         // Funções globais para modal de depósito
         function openDepositModal() {
             document.getElementById('depositModal').style.display = 'block';
+            // Fechar menu hambúrguer se estiver aberto
+            document.getElementById('dropdownMenu').classList.remove('active');
+            document.querySelector('.hamburger-btn').classList.remove('active');
         }
         
         function closeDepositModal() {
@@ -328,6 +555,10 @@
             document.getElementById('winType').textContent = winMessages[winType] || 'Você Ganhou!';
             document.getElementById('winAmount').textContent = `R$ ${amount.toFixed(2).replace('.', ',')}`;
             document.getElementById('winModal').style.display = 'block';
+            
+            // Fechar menu hambúrguer se estiver aberto
+            document.getElementById('dropdownMenu').classList.remove('active');
+            document.querySelector('.hamburger-btn').classList.remove('active');
             
             // Efeito de fogos de artifício
             setTimeout(() => {
@@ -399,6 +630,9 @@
             if (e.key === 'Escape') {
                 closeWinModal();
                 closeDepositModal();
+                // Fechar menu hambúrguer
+                document.getElementById('dropdownMenu').classList.remove('active');
+                document.querySelector('.hamburger-btn').classList.remove('active');
             }
         });
     </script>

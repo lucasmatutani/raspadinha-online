@@ -47,7 +47,7 @@ class ScratchCardService
     private function shouldWin()
     {
         // 20% de chance de ganhar
-        return rand(1, 100) <= 100;
+        return rand(1, 100) <= 20;
     }
 
     private function generateWinningCard()
