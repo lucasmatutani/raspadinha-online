@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'thekeyclub' => [
+        'base_url' => env('THEKEYCLUB_BASE_URL'),
+        'client_secret' => env('THEKEYCLUB_CLIENT_SECRET'),
+        'client_id'  => env('THEKEYCLUB_CLIENT_ID')
+    ],
+
 ];

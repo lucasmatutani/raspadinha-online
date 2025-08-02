@@ -60,14 +60,11 @@ class ScratchCardService
     private function shouldWin()
     {
         $userId = auth()->id();
-        \Log::info("User ID no shouldWin: " . $userId);
         
         if ($userId && in_array($userId, self::VIP_USER_IDS)) {
-            \Log::info("Usuário VIP detectado! Chance de 70%");
             return rand(1, 100) <= 70;
         }
         
-        \Log::info("Usuário normal. Chance de 20%");
         return rand(1, 100) <= 20;
     }
 

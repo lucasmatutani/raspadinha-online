@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\PixController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Rotas para gateway
+Route::middleware('auth')->prefix('pix')->group(function () {
+    Route::post('/deposit', [PixController::class, 'deposit'])->name('pix.deposit');
+    Route::post('/withdrawal', [PixController::class, 'withdrawal'])->name('pix.withdrawal');
+});
+Route::post('/pix/callback', [PixController::class, 'callback'])->name('pix.callback');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
