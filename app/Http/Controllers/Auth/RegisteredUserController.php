@@ -1,11 +1,9 @@
 <?php
-// app/Http/Controllers/Auth/RegisteredUserController.php
 
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,12 +31,14 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'document' => ['required', 'string', 'max:14', 'unique:users'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'document' => $request->document,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -47,7 +47,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // REDIRECIONAR PARA O JOGO APÓS REGISTRO
-        return redirect(route('game.index'));
+        return redirect(route('dashboard', absolute: false));
     }
 }
