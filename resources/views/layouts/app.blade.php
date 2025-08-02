@@ -25,26 +25,26 @@
 
         /* Responsividade do modal */
         @media (max-width: 480px) {
-            #depositModal {
+            #depositModal, #withdrawModal {
                 padding: 10px 0;
             }
 
-            #depositModal>div {
+            #depositModal>div, #withdrawModal>div {
                 width: 95%;
                 padding: 1.5rem;
                 margin: 10px auto;
             }
 
-            #depositModal h3 {
+            #depositModal h3, #withdrawModal h3 {
                 font-size: 1.3rem;
             }
 
-            #depositModal input {
+            #depositModal input, #withdrawModal input {
                 padding: 0.8rem;
                 font-size: 1rem;
             }
 
-            #depositModal .btn {
+            #depositModal .btn, #withdrawModal .btn {
                 padding: 0.8rem;
                 font-size: 1rem;
             }
@@ -52,11 +52,11 @@
 
         /* Melhor scroll no mobile */
         @media (max-height: 700px) {
-            #depositModal {
+            #depositModal, #withdrawModal {
                 padding: 5px 0;
             }
 
-            #depositModal>div {
+            #depositModal>div, #withdrawModal>div {
                 margin: 5px auto;
                 padding: 1.5rem;
             }
@@ -164,6 +164,20 @@
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(0, 255, 135, 0.5);
+        }
+
+        /* Botão de saque com cor diferente */
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            border: 2px solid #ffa500;
+            color: #1a1a2e;
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #ff8c00, #ff7700);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5);
         }
 
         .btn:disabled {
@@ -461,6 +475,7 @@
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
             <a href="#" class="btn" onclick="openDepositModal()">Depositar</a>
+            <a href="#" class="btn btn-warning" onclick="openWithdrawModal()">Sacar</a>
             <a href="{{ route('game.history') }}" class="btn">Histórico</a>
 
             <!-- Logout -->
@@ -488,6 +503,7 @@
                 </button>
 
                 <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#" class="btn btn-warning" onclick="openWithdrawModal()">💰 Sacar</a>
                     <a href="{{ route('game.history') }}" class="btn">📊 Histórico</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -580,6 +596,87 @@
             <div id="depositMessage" style="margin-top: 1rem;"></div>
         </div>
     </div>
+
+    <!-- Modal de Saque -->
+    <div id="withdrawModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; backdrop-filter: blur(5px); overflow-y: auto; padding: 20px 0;">
+        <div style="position: relative; margin: 20px auto; background: linear-gradient(145deg, #1a1a2e, #16213e); padding: 2rem; border-radius: 20px; border: 2px solid #ffa500; box-shadow: 0 10px 40px rgba(255,165,0,0.3); z-index: 1001; max-width: 500px; width: 90%; min-height: auto;">
+
+            <!-- Cabeçalho -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="color: #ffa500; margin: 0; font-size: 1.5rem;">💳 Solicitar Saque</h3>
+                <button onclick="closeWithdrawModal()" style="background: none; border: none; color: #666; font-size: 1.5rem; cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: all 0.3s ease;" onmouseover="this.style.color='#ff4757'; this.style.background='rgba(255,71,87,0.1)'" onmouseout="this.style.color='#666'; this.style.background='none'">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Formulário -->
+            <form id="withdrawForm">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.8rem; color: #ffa500; font-weight: bold; font-size: 1rem;">
+                        💰 Valor do Saque:
+                    </label>
+                    <input type="number" name="amount" min="1" step="0.01" required placeholder="Ex: 100.00"
+                        style="width: 100%; padding: 1rem; border-radius: 10px; border: 2px solid #666; background: #2a2a3e; color: white; font-size: 1.1rem; transition: all 0.3s ease;"
+                        onfocus="this.style.borderColor='#ffa500'"
+                        onblur="this.style.borderColor='#666'">
+                    <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #999;">
+                        Saldo disponível: R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.8rem; color: #ffa500; font-weight: bold; font-size: 1rem;">
+                        🔑 Tipo da Chave PIX:
+                    </label>
+                    <select name="key_type" required 
+                        style="width: 100%; padding: 1rem; border-radius: 10px; border: 2px solid #666; background: #2a2a3e; color: white; font-size: 1.1rem; transition: all 0.3s ease; cursor: pointer;"
+                        onfocus="this.style.borderColor='#ffa500'"
+                        onblur="this.style.borderColor='#666'"
+                        >
+                        <option value="" disabled selected style="color: #999;">Selecione o tipo de chave</option>
+                        <option value="cpf" style="background: #2a2a3e; color: white;">📄 CPF</option>
+                        <option value="phone" style="background: #2a2a3e; color: white;">📱 Telefone</option>
+                        <option value="email" style="background: #2a2a3e; color: white;">📧 E-mail</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.8rem; color: #ffa500; font-weight: bold; font-size: 1rem;">
+                        🏦 Chave PIX:
+                    </label>
+                    <input type="text" name="pix_key" id="pixKeyInput" required placeholder="Primeiro selecione o tipo de chave"
+                        style="width: 100%; padding: 1rem; border-radius: 10px; border: 2px solid #666; background: #2a2a3e; color: white; font-size: 1.1rem; transition: all 0.3s ease;"
+                        onfocus="this.style.borderColor='#ffa500'"
+                        onblur="this.style.borderColor='#666'"
+                        oninput="formatPixKey(this)">
+                    <div id="pixKeyHelper" style="margin-top: 0.5rem; font-size: 0.9rem; color: #999;">
+                        Selecione o tipo de chave acima para ver as instruções
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <button type="submit" class="btn btn-warning" style="flex: 1; padding: 1rem; font-size: 1.1rem; font-weight: bold;">
+                        💸 Solicitar Saque
+                    </button>
+                    <button type="button" class="btn" onclick="closeWithdrawModal()" style="flex: 0 0 auto; padding: 1rem;">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Loading -->
+            <div id="withdrawLoading" style="display: none; text-align: center; margin: 2rem 0;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #ffa500; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="color: #ffa500; margin-top: 1rem; font-weight: bold;">Processando saque...</p>
+            </div>
+
+            <!-- Mensagens -->
+            <div id="withdrawMessage" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
     @endauth
 
     <!-- Modal de Vitória -->
@@ -631,6 +728,282 @@
 
         function closeDepositModal() {
             document.getElementById('depositModal').style.display = 'none';
+            // Reset do formulário
+            document.getElementById('depositForm').style.display = 'block';
+            document.getElementById('depositMessage').innerHTML = '';
+        }
+
+        // Funções globais para modal de saque
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'block';
+            // Fechar menu hambúrguer se estiver aberto
+            document.getElementById('dropdownMenu').classList.remove('active');
+            document.querySelector('.hamburger-btn').classList.remove('active');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'none';
+            // Reset do formulário
+            document.getElementById('withdrawForm').reset();
+            document.getElementById('withdrawMessage').innerHTML = '';
+        }
+
+        // Função para atualizar placeholder e helper text baseado no tipo de chave
+        function updatePixKeyPlaceholder(keyType) {
+            const pixKeyInput = document.getElementById('pixKeyInput');
+            const pixKeyHelper = document.getElementById('pixKeyHelper');
+            
+            // switch(keyType) {
+            //     case 'cpf':
+            //         pixKeyInput.placeholder = 'Ex: 123.456.789-00';
+            //         pixKeyInput.setAttribute('maxlength', '14');
+            //         pixKeyHelper.innerHTML = 'Digite seu CPF (será formatado automaticamente)';
+            //         break;
+            //     case 'phone':
+            //         pixKeyInput.placeholder = 'Ex: (11) 99999-9999';
+            //         pixKeyInput.setAttribute('maxlength', '15');
+            //         pixKeyHelper.innerHTML = 'Digite seu telefone com DDD (será formatado automaticamente)';
+            //         break;
+            //     case 'email':
+            //         pixKeyInput.placeholder = 'Ex: seuemail@exemplo.com';
+            //         pixKeyInput.removeAttribute('maxlength');
+            //         pixKeyHelper.innerHTML = 'Digite seu e-mail completo';
+            //         break;
+            //     default:
+            //         pixKeyInput.placeholder = 'Primeiro selecione o tipo de chave';
+            //         pixKeyHelper.innerHTML = 'Selecione o tipo de chave acima para ver as instruções';
+            // }
+            
+            // Limpar o campo quando trocar de tipo
+            pixKeyInput.value = '';
+        }
+
+        // Função para formatar a chave PIX conforme o tipo
+        function formatPixKey(input) {
+            const keyType = document.querySelector('select[name="key_type"]').value;
+            let value = input.value.replace(/\D/g, ''); // Remove tudo que não é número
+            
+            switch(keyType) {
+                case 'cpf':
+                    // Formatação CPF: 123.456.789-00
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                    input.value = value;
+                    break;
+                case 'phone':
+                    // Formatação telefone: (11) 99999-9999
+                    value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                    value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+                    input.value = value;
+                    break;
+                case 'email':
+                    // Para email, não formatar - apenas manter o valor original
+                    input.value = input.value;
+                    break;
+            }
+        }
+
+        // Função para validar chave PIX antes do envio
+        function validatePixKey(keyType, pixKey) {
+            switch(keyType) {
+                case 'cpf':
+                    // Validação básica de CPF (11 dígitos)
+                    const cpfNumbers = pixKey.replace(/\D/g, '');
+                    return cpfNumbers.length === 11;
+                case 'phone':
+                    // Validação básica de telefone (10 ou 11 dígitos)
+                    const phoneNumbers = pixKey.replace(/\D/g, '');
+                    return phoneNumbers.length >= 10 && phoneNumbers.length <= 11;
+                case 'email':
+                    // Validação básica de email
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return emailRegex.test(pixKey);
+                default:
+                    return false;
+            }
+        }
+
+        // Submissão do formulário de saque
+        document.getElementById('withdrawForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const amount = formData.get('amount');
+            const keyType = formData.get('key_type');
+            const pixKey = formData.get('pix_key');
+
+            // Validar se o tipo de chave foi selecionado
+            if (!keyType) {
+                showValidationError('Por favor, selecione o tipo de chave PIX');
+                return;
+            }
+
+            // Validar formato da chave PIX
+            if (!validatePixKey(keyType, pixKey)) {
+                const errorMessages = {
+                    'cpf': 'CPF deve ter 11 dígitos válidos',
+                    'phone': 'Telefone deve ter 10 ou 11 dígitos',
+                    'email': 'E-mail deve ter um formato válido'
+                };
+                showValidationError(errorMessages[keyType]);
+                return;
+            }
+
+            // Mostra loading e limpa mensagens anteriores
+            document.getElementById('withdrawLoading').style.display = 'block';
+            document.getElementById('withdrawMessage').innerHTML = '';
+
+            // Desabilita o botão
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processando...';
+
+            try {
+                const response = await fetch('/pix/withdrawal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                        key_type: keyType,
+                        pix_key: pixKey
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Sucesso - mostrar mensagem de confirmação
+                    document.getElementById('withdrawForm').style.display = 'none';
+                    
+                    // Obter o nome amigável do tipo de chave
+                    const keyTypeNames = {
+                        'cpf': 'CPF',
+                        'phone': 'Telefone',
+                        'email': 'E-mail'
+                    };
+                    
+                    document.getElementById('withdrawMessage').innerHTML = `
+                        <div style="color: #00ff87; text-align: center;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+                            <h4 style="color: #ffa500; margin-bottom: 1rem; font-size: 1.4rem;">Saque Solicitado com Sucesso!</h4>
+                            
+                            <div style="background: rgba(255,165,0,0.1); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255,165,0,0.3); margin: 1.5rem 0;">
+                                <p style="font-size: 1.1rem; margin-bottom: 0.8rem;"><strong>Valor:</strong> R$ ${parseFloat(amount).toFixed(2).replace('.', ',')}</p>
+                                <p style="font-size: 1rem; margin-bottom: 0.8rem;"><strong>Tipo de Chave:</strong> ${keyTypeNames[keyType]}</p>
+                                <p style="font-size: 1rem; margin-bottom: 0.8rem;"><strong>Chave PIX:</strong> ${pixKey}</p>
+                                <p style="font-size: 0.9rem; color: #999;">ID da Solicitação: ${data.transaction_id || 'Processando...'}</p>
+                            </div>
+                            
+                            <div style="background: rgba(0,255,135,0.1); padding: 1.2rem; border-radius: 15px; border: 1px solid rgba(0,255,135,0.3); margin: 1.5rem 0;">
+                                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                                    <span style="width: 12px; height: 12px; background: #ffd700; border-radius: 50%; margin-right: 0.5rem; animation: pulse 2s infinite;"></span>
+                                    <span style="font-weight: bold; color: #ffd700;">Status: Em Análise</span>
+                                </div>
+                                
+                                <div style="text-align: left; font-size: 0.9rem; line-height: 1.6;">
+                                    <p style="margin-bottom: 0.8rem;"><strong>⏰ Prazo de processamento:</strong></p>
+                                    <p style="margin-bottom: 0.5rem;">• Dias úteis: até 2 horas</p>
+                                    <p style="margin-bottom: 0.5rem;">• Fins de semana: até 24 horas</p>
+                                    <p style="margin-bottom: 1rem;">• Feriados: até 24 horas</p>
+                                    
+                                    <p style="font-size: 0.85rem; color: #999; font-style: italic;">
+                                        💡 Você receberá uma notificação quando o saque for processado
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <button onclick="closeWithdrawModal()" class="btn btn-warning" style="padding: 1rem 2rem; font-size: 1.1rem; margin-top: 1rem;">
+                                Fechar
+                            </button>
+                        </div>
+                    `;
+
+                    // Atualizar saldo na tela (assumindo que o backend retorna o novo saldo)
+                    if (data.new_balance !== undefined) {
+                        const newBalanceFormatted = `R$ ${data.new_balance.toFixed(2).replace('.', ',')}`;
+                        document.getElementById('balance').textContent = newBalanceFormatted;
+                        document.getElementById('balance-mobile').textContent = newBalanceFormatted;
+                    }
+
+                } else {
+                    // Erro na solicitação
+                    document.getElementById('withdrawMessage').innerHTML = `
+                        <div style="color: #ff4757; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                            <h4 style="color: #ff4757; margin-bottom: 1rem;">Erro ao Solicitar Saque</h4>
+                            <p style="font-size: 1rem; margin-bottom: 1.5rem;">
+                                ${data.message || 'Não foi possível processar sua solicitação'}
+                            </p>
+                            
+                            <div style="background: rgba(255,71,87,0.1); padding: 1rem; border-radius: 10px; border: 1px solid rgba(255,71,87,0.3); margin-bottom: 1.5rem;">
+                                <p style="font-size: 0.9rem; line-height: 1.5;">
+                                    <strong>Possíveis causas:</strong><br>
+                                    • Saldo insuficiente<br>
+                                    • Chave PIX inválida<br>
+                                    • Valor abaixo do mínimo<br>
+                                    • Limite diário excedido
+                                </p>
+                            </div>
+                            
+                            <button onclick="resetWithdrawForm()" class="btn btn-warning" style="padding: 1rem 1.5rem; margin-right: 1rem;">
+                                Tentar Novamente
+                            </button>
+                            <button onclick="closeWithdrawModal()" class="btn" style="padding: 1rem 1.5rem;">
+                                Fechar
+                            </button>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('withdrawMessage').innerHTML = `
+                    <div style="color: #ff4757; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚫</div>
+                        <h4 style="color: #ff4757; margin-bottom: 1rem;">Erro de Conexão</h4>
+                        <p style="font-size: 1rem; margin-bottom: 1.5rem;">
+                            Não foi possível conectar com o servidor. Verifique sua conexão e tente novamente.
+                        </p>
+                        <button onclick="resetWithdrawForm()" class="btn btn-warning" style="padding: 1rem 1.5rem; margin-right: 1rem;">
+                            Tentar Novamente
+                        </button>
+                        <button onclick="closeWithdrawModal()" class="btn" style="padding: 1rem 1.5rem;">
+                            Fechar
+                        </button>
+                    </div>
+                `;
+            } finally {
+                // Esconde loading e reabilita botão
+                document.getElementById('withdrawLoading').style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💸 Solicitar Saque';
+            }
+        });
+
+        // Função para mostrar erros de validação
+        function showValidationError(message) {
+            document.getElementById('withdrawMessage').innerHTML = `
+                <div style="color: #ff4757; text-align: center; padding: 1rem; background: rgba(255,71,87,0.1); border-radius: 10px; border: 1px solid rgba(255,71,87,0.3);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
+                    <p style="font-size: 1rem; margin: 0;">${message}</p>
+                </div>
+            `;
+            
+            // Remover a mensagem após 3 segundos
+            setTimeout(() => {
+                document.getElementById('withdrawMessage').innerHTML = '';
+            }, 3000);
+        }
+
+        // Função para resetar o formulário de saque
+        function resetWithdrawForm() {
+            document.getElementById('withdrawForm').style.display = 'block';
+            document.getElementById('withdrawMessage').innerHTML = '';
         }
 
         // Submissão do formulário de depósito - VERSÃO ATUALIZADA
@@ -764,9 +1137,16 @@
                 // Esconde loading e reabilita botão
                 document.getElementById('depositLoading').style.display = 'none';
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Depositar';
+                submitBtn.textContent = '🚀 Gerar PIX';
             }
         });
+
+        // Função para resetar o modal de depósito
+        function resetDepositModal() {
+            document.getElementById('depositForm').style.display = 'block';
+            document.getElementById('depositForm').reset();
+            document.getElementById('depositMessage').innerHTML = '';
+        }
 
         // Função para gerar QR Code visual
         function generateQRCode(pixCode) {
@@ -1061,12 +1441,16 @@
             if (e.target.id === 'depositModal') {
                 closeDepositModal();
             }
+            if (e.target.id === 'withdrawModal') {
+                closeWithdrawModal();
+            }
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeWinModal();
                 closeDepositModal();
+                closeWithdrawModal();
                 // Fechar menu hambúrguer
                 document.getElementById('dropdownMenu').classList.remove('active');
                 document.querySelector('.hamburger-btn').classList.remove('active');

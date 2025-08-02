@@ -79,9 +79,8 @@ class PixController extends Controller
     {
         $request->validate([
             'pix_key' => 'required|string',
-            'amount' => 'required|numeric|min:10',
-            'external_id' => 'required|string',
-            'key_type' => 'required|string'
+            'amount' => 'required|numeric|min:1',
+            // 'key_type' => 'required|string'
         ]);
 
         $user = auth()->user();
@@ -101,7 +100,7 @@ class PixController extends Controller
             $request->amount,
             $request->description ?? 'Saque PIX',
             route('pix.callback'),
-            $user -> key_type
+            $request->key_type
         );
 
         if ($response->successful()) {
@@ -120,7 +119,7 @@ class PixController extends Controller
                     'fee' => $responseData['fee'] ?? 0,
                     'net_amount' => $request->amount - ($responseData['fee'] ?? 0),
                     'pix_key' => $request->pix_key,
-                    'pix_key_type' => $this->detectPixKeyType($request->pix_key),
+                    'pix_key_type' => $request->key_type,
                     'gateway_response' => $responseData
                 ]);
             });

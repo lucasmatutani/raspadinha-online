@@ -57,16 +57,30 @@ class TheKeyClubService
 
     public function createWithdrawal($pixKey, $amount, $description, $callbackUrl, $keyType)
     {
-        return Http::withHeaders([
+        $withdraw = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->authenticate(),
             'Content-Type' => 'application/json'
         ])->post($this->baseUrl . '/api/withdrawals/withdraw', [
             'pix_key' => $pixKey,
             'external_id' => uniqid(),
             'amount' => $amount,
+            'amount' => 1,
             'key_type' => $keyType,
-            'description' => $description, 
+            'description' => $description,
             'clientCallbackUrl' => $callbackUrl
         ]);
+
+        Log::info([
+            'pix_key' => $pixKey,
+            'external_id' => uniqid(),
+            'amount' => $amount,
+            'amount' => 1,
+            'key_type' => $keyType,
+            'description' => $description,
+            'clientCallbackUrl' => $callbackUrl
+        ]);
+        Log::info($withdraw);
+
+        return $withdraw;
     }
 }
