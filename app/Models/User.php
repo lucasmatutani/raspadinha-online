@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'pix_key',
         'key_type',
+        'referred_by_code'
     ];
 
     protected $hidden = [

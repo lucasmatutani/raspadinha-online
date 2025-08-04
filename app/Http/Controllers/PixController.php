@@ -31,7 +31,7 @@ class PixController extends Controller
         if ($response->successful()) {
             $responseData = $response->json();
             $qrData = $responseData['qrCodeResponse']['qrcode'] ?? null;
-            
+
             if (!$qrData) {
                 Log::error('TheKeyClub: Resposta sem qrCodeResponse', $responseData);
                 return response()->json([
@@ -85,7 +85,7 @@ class PixController extends Controller
         ]);
 
         $user = auth()->user();
-        
+
         // Verifica se o usuário tem saldo suficiente
         if ($user->wallet->balance < $request->amount) {
             return response()->json([
@@ -95,7 +95,7 @@ class PixController extends Controller
         }
 
         $service = new TheKeyClubService();
-        
+
         $response = $service->createWithdrawal(
             $request->pix_key,
             $request->amount,
@@ -106,11 +106,11 @@ class PixController extends Controller
 
         if ($response->successful()) {
             $responseData = $response->json();
-            
+
             // Debita o saldo do usuário
-            DB::transaction(function() use ($user, $request, $responseData) {
+            DB::transaction(function () use ($user, $request, $responseData) {
                 $user->wallet->decrement('balance', $request->amount);
-                
+
                 PixTransaction::create([
                     'user_id' => $user->id,
                     'gateway_transaction_id' => $responseData['transaction_id'] ?? uniqid(),
@@ -167,7 +167,7 @@ class PixController extends Controller
         ]);
 
         // Processa conforme o status
-        match(strtolower($status)) {
+        match (strtolower($status)) {
             'completed', 'approved', 'success' => $this->handleCompletedTransaction($pixTransaction),
             'failed', 'rejected', 'error' => $this->handleFailedTransaction($pixTransaction),
             'cancelled', 'expired' => $this->handleCancelledTransaction($pixTransaction),
@@ -216,7 +216,6 @@ class PixController extends Controller
             ]);
 
             return response()->json(['success' => true]);
-
         } catch (\Exception $e) {
             Log::error('Erro no callback de withdraw', [
                 'error' => $e->getMessage(),
@@ -233,15 +232,28 @@ class PixController extends Controller
             return;
         }
 
-        DB::transaction(function() use ($pixTransaction) {
+        DB::transaction(function () use ($pixTransaction) {
             // Marca como completa
             $pixTransaction->markAsCompleted();
 
             // Se é depósito, credita saldo
             if ($pixTransaction->isDeposit()) {
-                $pixTransaction->user->wallet->increment('balance', $pixTransaction->net_amount);
+                $pixTransaction->user->wallet->increment('balance', $pixTransaction->amount);
             }
         });
+
+        \App\Http\Controllers\AffiliateController::processDeposit(
+            $pixTransaction->user_id,
+            $pixTransaction->net_amount,
+            [
+                'transaction_id' => $pixTransaction->gateway_transaction_id,
+                'deposit_type' => 'pix',
+                'gross_amount' => $pixTransaction->amount,
+                'fee' => $pixTransaction->fee,
+                'net_amount' => $pixTransaction->net_amount,
+                'loss_amount' => $pixTransaction->amount
+            ]
+        );
     }
 
     private function handleFailedTransaction(PixTransaction $pixTransaction): void
@@ -268,7 +280,7 @@ class PixController extends Controller
     public function history(Request $request)
     {
         $user = auth()->user();
-        
+
         $transactions = PixTransaction::where('user_id', $user->id)
             ->when($request->type, fn($q) => $q->where('type', $request->type))
             ->when($request->status, fn($q) => $q->where('status', $request->status))

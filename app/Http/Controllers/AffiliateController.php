@@ -76,55 +76,72 @@ class AffiliateController extends Controller
     }
 
     /**
-     * Registrar comissão quando um usuário indicado perde dinheiro
+     * 🎯 NOVO: Processar comissão quando usuário indicado faz depósito
      */
-    public static function processLoss($userId, $lossAmount, $gameDetails = null)
+    public static function processDeposit($userId, $depositAmount, $depositDetails = null)
     {
-        $user = User::find($userId);
-        
-        // Verifica se o usuário foi indicado por alguém
-        if (!$user->referred_by_code) {
-            return false;
-        }
+        try {
+            $user = User::find($userId);
+            
+            if (!$user || !$user->referred_by_code) {
+                return false;
+            }
 
-        $affiliate = Affiliate::where('affiliate_code', $user->referred_by_code)
-            ->where('status', 'active')
-            ->first();
+            $affiliate = Affiliate::where('affiliate_code', $user->referred_by_code)
+                ->where('status', 'active')
+                ->first();
 
-        if (!$affiliate) {
-            return false;
-        }
+            if (!$affiliate) {
+                \Log::warning('Afiliado não encontrado para comissão de depósito', [
+                    'user_id' => $userId,
+                    'referred_by_code' => $user->referred_by_code
+                ]);
+                return false;
+            }
 
-        // Busca ou cria o registro de referência
-        $referral = Referral::firstOrCreate([
-            'affiliate_id' => $affiliate->id,
-            'referred_user_id' => $user->id
-        ], [
-            'registered_at' => $user->created_at
-        ]);
-
-        // Calcula a comissão (50% da perda)
-        $commissionAmount = ($lossAmount * $affiliate->commission_rate) / 100;
-
-        DB::transaction(function() use ($referral, $affiliate, $lossAmount, $commissionAmount, $gameDetails) {
-            // Cria a comissão
-            $commission = $referral->commissions()->create([
+            // Buscar ou criar o registro de referência
+            $referral = Referral::firstOrCreate([
                 'affiliate_id' => $affiliate->id,
-                'loss_amount' => $lossAmount,
-                'commission_amount' => $commissionAmount,
-                'status' => 'pending',
-                'game_details' => $gameDetails
+                'referred_user_id' => $user->id
+            ], [
+                'registered_at' => $user->created_at,
+                'total_deposits' => 0,
+                'total_commission' => 0
             ]);
 
-            // Atualiza totais do referral
-            $referral->increment('total_losses', $lossAmount);
-            $referral->increment('total_commission', $commissionAmount);
+            // 💰 CALCULAR COMISSÃO: 50% do depósito
+            $commissionAmount = ($depositAmount * $affiliate->commission_rate) / 100;
 
-            // Atualiza totais do afiliado
-            $affiliate->increment('pending_earnings', $commissionAmount);
-        });
+            DB::transaction(function() use ($referral, $affiliate, $depositAmount, $commissionAmount, $depositDetails) {
+                // Criar a comissão
+                $commission = $referral->commissions()->create([
+                    'affiliate_id' => $affiliate->id,
+                    'deposit_amount' => $depositAmount, // MUDANÇA: deposit_amount em vez de loss_amount
+                    'commission_amount' => $commissionAmount,
+                    'status' => 'pending',
+                    'deposit_details' => $depositDetails,
+                    'loss_amount' => $depositAmount
+                ]);
 
-        return true;
+                // Atualizar totais do referral
+                $referral->increment('total_deposits', $depositAmount); // MUDANÇA: total_deposits
+                $referral->increment('total_commission', $commissionAmount);
+
+                // Atualizar totais do afiliado
+                $affiliate->increment('pending_earnings', $commissionAmount);
+            });
+
+            return true;
+
+        } catch (\Exception $e) {
+            \Log::error('Erro ao processar comissão de depósito', [
+                'user_id' => $userId,
+                'deposit_amount' => $depositAmount,
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+            return false;
+        }
     }
 
     /**
