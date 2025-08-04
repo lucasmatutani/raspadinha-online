@@ -70,17 +70,6 @@ class TheKeyClubService
             'clientCallbackUrl' => $callbackUrl
         ]);
 
-        Log::info([
-            'pix_key' => $pixKey,
-            'external_id' => uniqid(),
-            'amount' => $amount,
-            'amount' => 1,
-            'key_type' => $keyType,
-            'description' => $description,
-            'clientCallbackUrl' => $callbackUrl
-        ]);
-        Log::info($withdraw);
-
         return $withdraw;
     }
 }

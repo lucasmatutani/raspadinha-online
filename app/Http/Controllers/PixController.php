@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PixTransaction;
+use App\Models\WithdrawTransaction; // Adicione esta linha
 use App\Services\TheKeyClubService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,7 +100,7 @@ class PixController extends Controller
             $request->pix_key,
             $request->amount,
             $request->description ?? 'Saque PIX',
-            route('pix.callback'),
+            route('withdraw.callback'),
             $request->key_type
         );
 
@@ -176,6 +177,56 @@ class PixController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // NOVO MÉTODO: Callback específico para withdraws
+    public function withdrawCallback(Request $request)
+    {
+        try {
+            // Valida os dados básicos
+            $request->validate([
+                'transaction_id' => 'required|string',
+                'status' => 'required|string',
+                'amount' => 'required|numeric',
+            ]);
+
+            $callbackData = $request->all();
+
+            // Busca ou cria a transação de withdraw
+            $withdrawTransaction = WithdrawTransaction::firstOrCreate(
+                ['transaction_id' => $callbackData['transaction_id']],
+                [
+                    'status' => 'PENDING',
+                    'amount' => $callbackData['amount'],
+                ]
+            );
+
+            // Atualiza com os dados do callback
+            $withdrawTransaction->update([
+                'status' => strtoupper($callbackData['status']),
+                'amount' => $callbackData['amount'],
+                'fee' => $callbackData['fee'] ?? null,
+                'ispb' => $callbackData['ispb'] ?? null,
+                'nome_recebedor' => $callbackData['nome_recebedor'] ?? null,
+                'cpf_recebedor' => $callbackData['cpf_recebedor'] ?? null,
+                'callback_data' => $callbackData,
+            ]);
+
+            Log::info('Callback de withdraw processado', [
+                'transaction_id' => $callbackData['transaction_id'],
+                'status' => $callbackData['status']
+            ]);
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            Log::error('Erro no callback de withdraw', [
+                'error' => $e->getMessage(),
+                'data' => $request->all()
+            ]);
+
+            return response()->json(['success' => false], 500);
+        }
+    }
+
     private function handleCompletedTransaction(PixTransaction $pixTransaction): void
     {
         if ($pixTransaction->isCompleted()) {
@@ -211,27 +262,6 @@ class PixController extends Controller
         if ($pixTransaction->isWithdrawal() && $pixTransaction->isPending()) {
             $pixTransaction->user->wallet->increment('balance', $pixTransaction->amount);
         }
-    }
-
-    private function detectPixKeyType(string $pixKey): string
-    {
-        if (filter_var($pixKey, FILTER_VALIDATE_EMAIL)) {
-            return 'email';
-        }
-        
-        if (preg_match('/^\+?[\d\s\-\(\)]+$/', $pixKey)) {
-            return 'phone';
-        }
-        
-        if (preg_match('/^\d{11}$/', preg_replace('/\D/', '', $pixKey))) {
-            return 'cpf';
-        }
-        
-        if (preg_match('/^\d{14}$/', preg_replace('/\D/', '', $pixKey))) {
-            return 'cnpj';
-        }
-        
-        return 'random';
     }
 
     // Método para listar transações do usuário

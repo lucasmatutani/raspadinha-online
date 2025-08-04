@@ -47,11 +47,41 @@ class User extends Authenticatable
         return $this->hasMany(ScratchCard::class);
     }
 
+    public function affiliate()
+    {
+        return $this->hasOne(Affiliate::class);
+    }
+
+    public function referredBy()
+    {
+        return $this->belongsTo(Affiliate::class, 'referred_by_code', 'affiliate_code');
+    }
+
+    public function asReferral()
+    {
+        return $this->hasOne(Referral::class, 'referred_user_id');
+    }
+
+    // Método para criar afiliado automaticamente
+    public function createAffiliate()
+    {
+        if (!$this->affiliate) {
+            return Affiliate::create([
+                'user_id' => $this->id,
+                'affiliate_code' => Affiliate::generateUniqueCode(),
+                'commission_rate' => 50.00,
+                'status' => 'active'
+            ]);
+        }
+
+        return $this->affiliate;
+    }
+
     // Criar carteira automaticamente quando criar usuário
     protected static function boot()
     {
         parent::boot();
-        
+
         static::created(function ($user) {
             $user->wallet()->create(['balance' => 0]);
         });
