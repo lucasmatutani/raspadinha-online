@@ -22,7 +22,7 @@ class ScratchCardService
         200000  // R$ 2.000,00
     ];
 
-    private const BET_AMOUNT = 5.00;
+    private const BET_AMOUNT = 1.00;
 
     // Tabela de prêmios baseada nos valores dos símbolos
     private const PRIZE_MULTIPLIERS = [
@@ -66,10 +66,8 @@ class ScratchCardService
         $userId = auth()->id();
 
         if ($userId && in_array($userId, $this->getVipUserIds())) {
-            \Log::info('VIIIIIIIP');
-            return rand(1, 100) <= 70;
+            return rand(1, 100) <= 80;
         }
-        \Log::info('NAAAAAOOOO VIIIIIIIP');
         return rand(1, 100) <= 20;
     }
 

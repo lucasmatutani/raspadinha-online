@@ -477,7 +477,7 @@
                 prizeInfo.style.display = 'none';
                 revealedCells = 0;
 
-                balanceGame = currentBalance - 5;
+                balanceGame = currentBalance - 1;
                 updateBalance(balanceGame);
 
                 // Reset das células

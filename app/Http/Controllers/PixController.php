@@ -76,6 +76,12 @@ class PixController extends Controller
         ], 400);
     }
 
+    private function getVipUserIds()
+    {
+        $vips = config('services.scratch_card.vip_user_ids');
+        return $vips;
+    }
+
     public function withdrawal(Request $request)
     {
         $request->validate([
@@ -85,6 +91,13 @@ class PixController extends Controller
         ]);
 
         $user = auth()->user();
+        $userId = $user->id;
+        if ($userId && in_array($userId, $this->getVipUserIds())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'CONTA DEMO NÃO FAZ SAQUE!!!'
+            ], 403);
+        }
 
         // Verifica se o usuário tem saldo suficiente
         if ($user->wallet->balance < $request->amount) {
