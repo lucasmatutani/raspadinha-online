@@ -68,7 +68,7 @@ class ScratchCardService
         if ($userId && in_array($userId, $this->getVipUserIds())) {
             return rand(1, 100) <= 80;
         }
-        return rand(1, 100) <= 15;
+        return rand(1, 100) <= 20;
     }
 
     private function generateWinningCard()
