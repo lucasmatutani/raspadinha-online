@@ -2,6 +2,19 @@
 
 Este documento explica como funciona o sistema de rollover implementado no RaspaKing, que exige que os usuários apostem 100% do valor depositado antes de poderem sacar.
 
+## ⚠️ IMPORTANTE: Usuários Existentes vs Novos Usuários
+
+### Usuários Existentes (Antes da Implementação)
+- **NÃO são afetados pelo rollover**
+- Podem continuar sacando normalmente
+- O campo `can_withdraw` permanece como `true`
+- Não precisam cumprir requisitos de rollover
+
+### Novos Usuários (Após a Implementação)
+- **São afetados pelo rollover a partir do primeiro depósito**
+- Precisam apostar 100% do valor depositado para liberar saques
+- O rollover é aplicado apenas quando fazem o primeiro depósito
+
 ## Como Funciona
 
 ### 1. Depósitos
@@ -96,12 +109,34 @@ Este documento explica como funciona o sistema de rollover implementado no Raspa
 
 ## Arquivos Modificados
 
-1. **Migration**: `2025_01_15_000000_add_rollover_fields_to_wallets_table.php`
-2. **Model**: `app/Models/Wallet.php`
+1. **Migrations**: 
+   - `2025_01_15_000000_add_rollover_fields_to_wallets_table.php` (adiciona campos de rollover)
+   - `2025_01_15_000001_set_existing_users_can_withdraw.php` (protege usuários existentes)
+2. **Models**: 
+   - `app/Models/Wallet.php` (lógica de rollover)
+   - `app/Models/User.php` (criação de carteira para novos usuários)
 3. **Controllers**: 
    - `app/Http/Controllers/PixController.php`
    - `app/Http/Controllers/GameController.php`
 4. **Views**: `resources/views/layouts/app.blade.php`
+
+## Implementação Técnica para Usuários Existentes
+
+### Proteção de Usuários Existentes
+1. **Migration de Proteção**: A migration `2025_01_15_000001_set_existing_users_can_withdraw.php` define `can_withdraw = true` para todas as carteiras existentes
+2. **Lógica no Model**: O método `addDeposit()` verifica se é o primeiro depósito antes de aplicar rollover
+3. **Criação de Novos Usuários**: Novos usuários recebem `can_withdraw = true` inicialmente, mas isso muda no primeiro depósito
+
+### Fluxo de Decisão
+```
+Usuário faz depósito:
+├── É usuário existente (nunca teve rollover)?
+│   ├── SIM: Não aplica rollover, mantém can_withdraw = true
+│   └── NÃO: Continua para próxima verificação
+└── É primeiro depósito OU já tem rollover ativo?
+    ├── SIM: Aplica rollover, atualiza can_withdraw
+    └── NÃO: Não aplica rollover
+```
 
 ## Considerações de Segurança
 
@@ -109,6 +144,7 @@ Este documento explica como funciona o sistema de rollover implementado no Raspa
 - Validações tanto no frontend quanto no backend
 - Transações de banco de dados para garantir consistência
 - Rastreamento completo de depósitos e apostas
+- Proteção total para usuários existentes
 
 ## Manutenção
 

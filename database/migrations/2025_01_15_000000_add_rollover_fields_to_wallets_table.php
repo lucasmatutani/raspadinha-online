@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('total_wagered', 10, 2)->default(0)->after('total_deposited');
             $table->decimal('rollover_requirement', 10, 2)->default(0)->after('total_wagered');
             $table->decimal('rollover_completed', 10, 2)->default(0)->after('rollover_requirement');
-            $table->boolean('can_withdraw')->default(true)->after('rollover_completed');
+            $table->boolean('can_withdraw')->default(false)->after('rollover_completed');
         });
     }
 

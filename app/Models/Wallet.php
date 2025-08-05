@@ -47,13 +47,23 @@ class Wallet extends Model
 
     /**
      * Adiciona um depósito e atualiza o requisito de rollover
+     * O rollover só é aplicado a partir do primeiro depósito
      */
     public function addDeposit($amount)
     {
+        // Verificar se é o primeiro depósito ou se já existe rollover ativo
+        $isFirstDeposit = $this->total_deposited == 0;
+        $hasActiveRollover = $this->rollover_requirement > 0;
+        
         $this->increment('balance', $amount);
         $this->increment('total_deposited', $amount);
-        $this->increment('rollover_requirement', $amount); // 100% do depósito
-        $this->update(['can_withdraw' => $this->checkCanWithdraw()]);
+        
+        // Aplicar rollover apenas para novos usuários (primeiro depósito) ou usuários que já têm rollover ativo
+        if ($isFirstDeposit || $hasActiveRollover) {
+            $this->increment('rollover_requirement', $amount); // 100% do depósito
+            $this->update(['can_withdraw' => $this->checkCanWithdraw()]);
+        }
+        // Usuários existentes que nunca tiveram rollover continuam podendo sacar
     }
 
     /**

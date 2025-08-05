@@ -84,7 +84,10 @@ class User extends Authenticatable
         parent::boot();
 
         static::created(function ($user) {
-            $user->wallet()->create(['balance' => 0]);
+            $user->wallet()->create([
+            'balance' => 0,
+            'can_withdraw' => true // Novos usuários podem sacar até fazerem o primeiro depósito
+        ]);
         });
     }
 }
