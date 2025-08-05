@@ -68,7 +68,7 @@ class ScratchCardService
         if ($userId && in_array($userId, $this->getVipUserIds())) {
             return rand(1, 100) <= 80;
         }
-        return rand(1, 100) <= 20;
+        return rand(1, 100) <= 15;
     }
 
     private function generateWinningCard()
@@ -255,18 +255,18 @@ class ScratchCardService
     {
         // Valores menores têm maior probabilidade
         $weights = [
-            50 => 25,     // R$ 0,50 - 25%
-            100 => 20,    // R$ 1,00 - 20%
-            200 => 15,    // R$ 2,00 - 15%
-            500 => 12,    // R$ 5,00 - 12%
-            1000 => 10,   // R$ 10,00 - 10%
-            2000 => 8,    // R$ 20,00 - 8%
-            5000 => 5,    // R$ 50,00 - 5%
-            10000 => 3,   // R$ 100,00 - 3%
-            20000 => 1.5, // R$ 200,00 - 1.5%
-            50000 => 0.3, // R$ 500,00 - 0.3%
-            100000 => 0.15, // R$ 1.000,00 - 0.15%
-            200000 => 0.05  // R$ 2.000,00 - 0.05%
+            50 => 30,
+            100 => 25,
+            200 => 20,
+            500 => 10,
+            1000 => 8,
+            2000 => 4,
+            5000 => 2,
+            10000 => 0.8,
+            20000 => 0.15,
+            50000 => 0.04,
+            100000 => 0.01,
+            200000 => 0.005
         ];
 
         $totalWeight = array_sum($weights);
