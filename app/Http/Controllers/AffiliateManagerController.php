@@ -50,7 +50,7 @@ class AffiliateManagerController extends Controller
                                 'created_at' => $referral->referredUser->created_at->format('d/m/Y H:i'),
                             ],
                             'total_losses' => $referral->total_losses,
-                            'total_commission' => $referral->total_commission,
+                            'total_commission' => $referral->commissions()->where('commission_amount', '>', 0)->sum('commission_amount'),
                             'registered_at' => $referral->registered_at->format('d/m/Y'),
                         ];
                     }),

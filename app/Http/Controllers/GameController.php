@@ -172,17 +172,18 @@ class GameController extends Controller
                 'total_commission' => 0
             ]);
 
-            // Calcular comissão (taxa do afiliado % da perda)
-            $commissionAmount = ($lossAmount * $affiliate->commission_rate) / 100;
+            // Registramos a perda, mas não incrementamos comissões
+            // Isso garante que as estatísticas de perdas sejam mantidas
+            // sem gerar comissões para o afiliado
 
-            DB::transaction(function() use ($referral, $affiliate, $lossAmount, $commissionAmount, $gameData) {
-                // Criar a comissão
+            DB::transaction(function() use ($referral, $affiliate, $lossAmount, $gameData) {
+                // Registrar a perda sem gerar comissão
                 $commission = $referral->commissions()->create([
                     'affiliate_id' => $affiliate->id,
                     'loss_amount' => $lossAmount,
                     'deposit_amount' => null, // Não é um depósito
-                    'commission_amount' => $commissionAmount,
-                    'status' => 'pending',
+                    'commission_amount' => 0, // Sem comissão para perdas
+                    'status' => 'pending', // Usamos o status padrão, mas com valor zero
                     'game_details' => [
                         'type' => 'scratch_card',
                         'bet_amount' => $lossAmount,
@@ -192,25 +193,21 @@ class GameController extends Controller
                     'deposit_details' => null // Não é um depósito
                 ]);
 
-                // Atualizar totais do referral
+                // Atualizar apenas o total de perdas do referral
                 $referral->increment('total_losses', $lossAmount);
-                $referral->increment('total_commission', $commissionAmount);
-
-                // Atualizar totais do afiliado
-                $affiliate->increment('pending_earnings', $commissionAmount);
+                // Não incrementamos total_commission nem pending_earnings
             });
 
-            Log::info('Comissão de perda processada com sucesso', [
+            Log::info('Perda registrada com sucesso (sem comissão)', [
                 'user_id' => $userId,
                 'affiliate_id' => $affiliate->id,
-                'loss_amount' => $lossAmount,
-                'commission_amount' => $commissionAmount
+                'loss_amount' => $lossAmount
             ]);
 
             return true;
 
         } catch (\Exception $e) {
-            Log::error('Erro ao processar comissão de perda', [
+            Log::error('Erro ao registrar perda', [
                 'user_id' => $userId,
                 'loss_amount' => $lossAmount,
                 'error' => $e->getMessage(),
