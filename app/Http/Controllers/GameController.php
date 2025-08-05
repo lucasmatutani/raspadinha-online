@@ -61,6 +61,9 @@ class GameController extends Controller
             DB::transaction(function () use ($user, $betAmount, &$cardData, &$newBalance) {
                 // Debitar da carteira
                 $user->wallet->deductFunds($betAmount);
+                
+                // Registrar aposta no rollover
+                $user->wallet->addWager($betAmount);
 
                 // Registrar transação de aposta - USANDO O MODEL DIRETAMENTE
                 Transaction::create([

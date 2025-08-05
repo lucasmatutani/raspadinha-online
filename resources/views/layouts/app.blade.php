@@ -673,8 +673,22 @@
             <div class="balance" id="balance">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
+            @if(auth()->user()->wallet->rollover_requirement > 0)
+            <div class="rollover-info" style="font-size: 0.8rem; color: #ffa500; margin: 0.2rem 0;">
+                Rollover: {{ number_format(auth()->user()->wallet->getRolloverPercentage(), 1) }}%
+                @if(!auth()->user()->wallet->checkCanWithdraw())
+                    <span style="color: #ff6b6b;">(R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }} restante)</span>
+                @else
+                    <span style="color: #51cf66;">✓ Completo</span>
+                @endif
+            </div>
+            @endif
             <a href="#" class="btn" onclick="openDepositModal()">Depositar</a>
-            <a href="#" class="btn btn-warning" onclick="openWithdrawModal()">Sacar</a>
+            <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" 
+               @if(!auth()->user()->wallet->checkCanWithdraw()) 
+                   style="opacity: 0.6; cursor: not-allowed;" 
+                   title="Complete o rollover para sacar"
+               @endif>Sacar</a>
             <a href="#" class="btn btn-affiliate" id="affiliateBtn">🤝 Afiliado</a>
             <a href="{{ route('game.history') }}" class="btn">Histórico</a>
 
@@ -692,6 +706,16 @@
             <div class="balance" id="balance-mobile">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
+            @if(auth()->user()->wallet->rollover_requirement > 0)
+            <div class="rollover-info" style="font-size: 0.7rem; color: #ffa500; margin: 0.2rem 0; text-align: center;">
+                Rollover: {{ number_format(auth()->user()->wallet->getRolloverPercentage(), 1) }}%
+                @if(!auth()->user()->wallet->checkCanWithdraw())
+                    <span style="color: #ff6b6b;">(R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }} restante)</span>
+                @else
+                    <span style="color: #51cf66;">✓ Completo</span>
+                @endif
+            </div>
+            @endif
             <a href="#" class="btn btn-primary" onclick="openDepositModal()">Depositar</a>
 
             <!-- Menu Hambúrguer -->
@@ -703,7 +727,11 @@
                 </button>
 
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="#" class="btn btn-warning" onclick="openWithdrawModal()">💰 Sacar</a>
+                    <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" 
+                       @if(!auth()->user()->wallet->checkCanWithdraw()) 
+                           style="opacity: 0.6; cursor: not-allowed;" 
+                           title="Complete o rollover para sacar"
+                       @endif>💰 Sacar</a>
                     <a href="#" class="btn btn-affiliate" id="affiliateBtnMobile">🤝 Afiliado</a>
                     <a href="{{ route('game.history') }}" class="btn">📊 Histórico</a>
                     <form method="POST" action="{{ route('logout') }}">
@@ -1427,6 +1455,14 @@
 
         // Funções globais para modal de saque
         function openWithdrawModal() {
+            @if(!auth()->user()->wallet->checkCanWithdraw())
+                const remaining = {{ auth()->user()->wallet->getRemainingRollover() }};
+                const percentage = {{ auth()->user()->wallet->getRolloverPercentage() }};
+                
+                alert(`Você precisa apostar mais R$ ${remaining.toFixed(2).replace('.', ',')} para liberar o saque.\nProgresso do rollover: ${percentage.toFixed(1)}%`);
+                return;
+            @endif
+            
             document.getElementById('withdrawModal').style.display = 'block';
             // Fechar menu hambúrguer se estiver aberto
             document.getElementById('dropdownMenu').classList.remove('active');

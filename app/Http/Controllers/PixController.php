@@ -107,6 +107,17 @@ class PixController extends Controller
             ], 400);
         }
 
+        // Verifica se o usuário completou o rollover necessário
+        if (!$user->wallet->checkCanWithdraw()) {
+            $remaining = $user->wallet->getRemainingRollover();
+            $percentage = $user->wallet->getRolloverPercentage();
+            
+            return response()->json([
+                'success' => false,
+                'message' => "Você precisa apostar mais R$ " . number_format($remaining, 2, ',', '.') . " para liberar o saque. Progresso: " . number_format($percentage, 1) . "%"
+            ], 400);
+        }
+
         $service = new TheKeyClubService();
 
         $response = $service->createWithdrawal(
@@ -249,9 +260,9 @@ class PixController extends Controller
             // Marca como completa
             $pixTransaction->markAsCompleted();
 
-            // Se é depósito, credita saldo
+            // Se é depósito, credita saldo e atualiza rollover
             if ($pixTransaction->isDeposit()) {
-                $pixTransaction->user->wallet->increment('balance', $pixTransaction->amount);
+                $pixTransaction->user->wallet->addDeposit($pixTransaction->amount);
             }
         });
 
