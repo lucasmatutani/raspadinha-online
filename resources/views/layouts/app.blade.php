@@ -852,7 +852,7 @@
                     <label style="display: block; margin-bottom: 0.8rem; color: #00ff87; font-weight: bold; font-size: 1rem;">
                         💵 Valor do Depósito:
                     </label>
-                    <input type="number" name="amount" min="1" step="0.01" required placeholder="Ex: 50.00"
+                    <input type="number" name="amount" min="10" step="0.01" required placeholder="Ex: 50.00"
                         style="width: 100%; padding: 1rem; border-radius: 10px; border: 2px solid #666; background: #2a2a3e; color: white; font-size: 1.1rem; transition: all 0.3s ease;"
                         onfocus="this.style.borderColor='#00ff87'"
                         onblur="this.style.borderColor='#666'">
@@ -1489,17 +1489,6 @@
             // Validar se o tipo de chave foi selecionado
             if (!keyType) {
                 showValidationError('Por favor, selecione o tipo de chave PIX');
-                return;
-            }
-
-            // Validar formato da chave PIX
-            if (!validatePixKey(keyType, pixKey)) {
-                const errorMessages = {
-                    'cpf': 'CPF deve ter 11 dígitos válidos',
-                    'phone': 'Telefone deve ter 10 ou 11 dígitos',
-                    'email': 'E-mail deve ter um formato válido'
-                };
-                showValidationError(errorMessages[keyType]);
                 return;
             }
 

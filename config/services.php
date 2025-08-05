@@ -37,4 +37,8 @@ return [
         'client_id'  => env('THEKEYCLUB_CLIENT_ID')
     ],
 
+    'scratch_card' => [
+        'vip_user_ids' => array_map('intval', explode(',', env('DEMO_ACOUNTS'))),
+    ]
+
 ];

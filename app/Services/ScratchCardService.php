@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
@@ -20,23 +21,20 @@ class ScratchCardService
         100000, // R$ 1.000,00
         200000  // R$ 2.000,00
     ];
-    
+
     private const BET_AMOUNT = 5.00;
-    
+
     // Tabela de prêmios baseada nos valores dos símbolos
     private const PRIZE_MULTIPLIERS = [
         // 3 símbolos iguais = valor do símbolo como prêmio
         'three_same' => 1.0,
-        
+
         // Padrões especiais multiplicam o valor base
         'horizontal_line' => 2.0,
         'vertical_line' => 2.0,
         'diagonal' => 3.0,
         'corners' => 4.0, // 4 cantos iguais
     ];
-
-    // IDs com chance especial de 70%
-    private const VIP_USER_IDS = [1, 2, 3]; // Adicione os IDs que você quiser 
 
     private $userId;
 
@@ -46,10 +44,16 @@ class ScratchCardService
         $this->userId = $userId;
     }
 
+    private function getVipUserIds()
+    {
+        $vips = config('services.scratch_card.vip_user_ids');
+        return $vips;
+    }
+
     public function generateCard()
     {
         $willWin = $this->shouldWin();
-        
+
         if ($willWin) {
             return $this->generateWinningCard();
         } else {
@@ -60,18 +64,19 @@ class ScratchCardService
     private function shouldWin()
     {
         $userId = auth()->id();
-        
-        if ($userId && in_array($userId, self::VIP_USER_IDS)) {
+
+        if ($userId && in_array($userId, $this->getVipUserIds())) {
+            \Log::info('VIIIIIIIP');
             return rand(1, 100) <= 70;
         }
-        
+        \Log::info('NAAAAAOOOO VIIIIIIIP');
         return rand(1, 100) <= 20;
     }
 
     private function generateWinningCard()
     {
         $winType = $this->selectWinType();
-        
+
         switch ($winType) {
             case 'horizontal_line':
                 return $this->createHorizontalLine();
@@ -113,12 +118,12 @@ class ScratchCardService
     {
         // Escolher valor vencedor com probabilidade baseada no valor
         $winningValue = $this->selectWeightedSymbol();
-        
+
         $grid = $this->createRandomGrid();
-        
+
         // Colocar 3 símbolos iguais em posições aleatórias
         $positions = $this->getRandomPositions(3);
-        
+
         foreach ($positions as $pos) {
             $grid[$pos[0]][$pos[1]] = $winningValue;
         }
@@ -138,7 +143,7 @@ class ScratchCardService
         $grid = $this->createRandomGrid();
         $lineIndex = rand(0, 2);
         $value = $this->selectWeightedSymbol();
-        
+
         // Preencher linha inteira
         for ($col = 0; $col < 3; $col++) {
             $grid[$lineIndex][$col] = $value;
@@ -159,7 +164,7 @@ class ScratchCardService
         $grid = $this->createRandomGrid();
         $colIndex = rand(0, 2);
         $value = $this->selectWeightedSymbol();
-        
+
         // Preencher coluna inteira
         for ($row = 0; $row < 3; $row++) {
             $grid[$row][$colIndex] = $value;
@@ -179,7 +184,7 @@ class ScratchCardService
     {
         $grid = $this->createRandomGrid();
         $value = $this->selectWeightedSymbol();
-        
+
         if (rand(0, 1)) {
             // Diagonal principal
             $grid[0][0] = $value;
@@ -206,7 +211,7 @@ class ScratchCardService
     {
         $grid = $this->createRandomGrid();
         $value = $this->selectWeightedSymbol();
-        
+
         // 4 cantos
         $grid[0][0] = $value;
         $grid[0][2] = $value;
@@ -268,7 +273,7 @@ class ScratchCardService
 
         $totalWeight = array_sum($weights);
         $random = mt_rand(1, $totalWeight * 100) / 100;
-        
+
         $accumulated = 0;
         foreach ($weights as $value => $weight) {
             $accumulated += $weight;
@@ -283,7 +288,7 @@ class ScratchCardService
     private function generateLosingCard()
     {
         $grid = $this->createRandomGrid();
-        
+
         // Garantir que não há combinação vencedora
         $attempts = 0;
         while ($this->checkIfWinning($grid) && $attempts < 50) {

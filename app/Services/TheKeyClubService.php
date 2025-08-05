@@ -48,7 +48,7 @@ class TheKeyClubService
             'payer' => [
                 'name' => $user->name,
                 'email' => $user->email,
-                'document' => "44199807888"
+                'document' => $user->document
             ]
         ]);
 
