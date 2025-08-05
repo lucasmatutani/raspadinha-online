@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\PixController;
 use App\Http\Controllers\AffiliateController;
+use App\Http\Controllers\AffiliateManagerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,13 @@ Route::post('/withdraw/callback', [App\Http\Controllers\PixController::class, 'w
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Rotas para o gerenciador de afiliados
+Route::middleware('auth')->group(function () {
+    Route::get('/afiliate_manager/UmFzcGFkaW5oYQ==', [AffiliateManagerController::class, 'index'])->name('affiliate.manager');
+    Route::post('/affiliate_manager/{id}/commission', [AffiliateManagerController::class, 'updateCommissionRate'])->name('affiliate.update.commission');
+    Route::post('/affiliate_manager/{id}/status', [AffiliateManagerController::class, 'updateStatus'])->name('affiliate.update.status');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
