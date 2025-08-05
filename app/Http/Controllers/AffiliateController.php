@@ -116,11 +116,11 @@ class AffiliateController extends Controller
                 // Criar a comissão
                 $commission = $referral->commissions()->create([
                     'affiliate_id' => $affiliate->id,
-                    'deposit_amount' => $depositAmount, // MUDANÇA: deposit_amount em vez de loss_amount
+                    'deposit_amount' => $depositAmount, // Valor do depósito
                     'commission_amount' => $commissionAmount,
                     'status' => 'pending',
                     'deposit_details' => $depositDetails,
-                    'loss_amount' => $depositAmount
+                    'loss_amount' => 0 // Depósito não é perda
                 ]);
 
                 // Atualizar totais do referral

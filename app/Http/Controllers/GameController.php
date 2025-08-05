@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\ScratchCard;
 use App\Models\Transaction; // Importar o model diretamente
+use App\Models\User;
+use App\Models\Affiliate;
+use App\Models\Referral;
+use App\Models\Commission;
 use App\Services\ScratchCardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @phpstan-ignore-next-line
@@ -90,6 +95,9 @@ class GameController extends Controller
                         'status' => 'completed',
                         'description' => "Prêmio raspadinha - {$cardData['win_type']}"
                     ]);
+                } else {
+                    // Se perdeu, processar comissão para o afiliado
+                    $this->processLossCommission($user->id, $betAmount, $cardData);
                 }
 
                 $newBalance = $user->wallet->fresh()->balance;
@@ -120,5 +128,95 @@ class GameController extends Controller
             ->paginate(20);
 
         return view('game.history', compact('cards'));
+    }
+
+    /**
+     * Processa comissão para o afiliado quando um usuário referido perde
+     * 
+     * @param int $userId ID do usuário que jogou
+     * @param float $lossAmount Valor da perda (aposta)
+     * @param array $gameData Dados do jogo
+     * @return bool
+     */
+    private function processLossCommission($userId, $lossAmount, $gameData)
+    {
+        try {
+            $user = User::find($userId);
+            
+            // Verificar se o usuário existe e tem código de referência
+            if (!$user || !$user->referred_by_code) {
+                return false;
+            }
+
+            // Buscar o afiliado pelo código
+            $affiliate = Affiliate::where('affiliate_code', $user->referred_by_code)
+                ->where('status', 'active')
+                ->first();
+
+            if (!$affiliate) {
+                Log::warning('Afiliado não encontrado para comissão de perda', [
+                    'user_id' => $userId,
+                    'referred_by_code' => $user->referred_by_code
+                ]);
+                return false;
+            }
+
+            // Buscar ou criar o registro de referência
+            $referral = Referral::firstOrCreate([
+                'affiliate_id' => $affiliate->id,
+                'referred_user_id' => $user->id
+            ], [
+                'registered_at' => $user->created_at,
+                'total_losses' => 0,
+                'total_deposits' => 0,
+                'total_commission' => 0
+            ]);
+
+            // Calcular comissão (taxa do afiliado % da perda)
+            $commissionAmount = ($lossAmount * $affiliate->commission_rate) / 100;
+
+            DB::transaction(function() use ($referral, $affiliate, $lossAmount, $commissionAmount, $gameData) {
+                // Criar a comissão
+                $commission = $referral->commissions()->create([
+                    'affiliate_id' => $affiliate->id,
+                    'loss_amount' => $lossAmount,
+                    'deposit_amount' => null, // Não é um depósito
+                    'commission_amount' => $commissionAmount,
+                    'status' => 'pending',
+                    'game_details' => [
+                        'type' => 'scratch_card',
+                        'bet_amount' => $lossAmount,
+                        'grid' => $gameData['grid'],
+                        'played_at' => now()->toDateTimeString()
+                    ],
+                    'deposit_details' => null // Não é um depósito
+                ]);
+
+                // Atualizar totais do referral
+                $referral->increment('total_losses', $lossAmount);
+                $referral->increment('total_commission', $commissionAmount);
+
+                // Atualizar totais do afiliado
+                $affiliate->increment('pending_earnings', $commissionAmount);
+            });
+
+            Log::info('Comissão de perda processada com sucesso', [
+                'user_id' => $userId,
+                'affiliate_id' => $affiliate->id,
+                'loss_amount' => $lossAmount,
+                'commission_amount' => $commissionAmount
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Erro ao processar comissão de perda', [
+                'user_id' => $userId,
+                'loss_amount' => $lossAmount,
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+            return false;
+        }
     }
 }

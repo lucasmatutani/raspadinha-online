@@ -85,12 +85,14 @@ class Referral extends Model
         'referred_user_id',
         'registered_at',
         'total_losses',
+        'total_deposits',
         'total_commission'
     ];
 
     protected $casts = [
         'registered_at' => 'datetime',
         'total_losses' => 'decimal:2',
+        'total_deposits' => 'decimal:2',
         'total_commission' => 'decimal:2'
     ];
 
@@ -124,15 +126,19 @@ class Commission extends Model
         'affiliate_id',
         'referral_id',
         'loss_amount',
+        'deposit_amount',
         'commission_amount',
         'status',
-        'game_details'
+        'game_details',
+        'deposit_details'
     ];
 
     protected $casts = [
         'loss_amount' => 'decimal:2',
+        'deposit_amount' => 'decimal:2',
         'commission_amount' => 'decimal:2',
-        'game_details' => 'array'
+        'game_details' => 'array',
+        'deposit_details' => 'array'
     ];
 
     public function affiliate()
