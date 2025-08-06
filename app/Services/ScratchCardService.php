@@ -30,10 +30,10 @@ class ScratchCardService
         'three_same' => 1.0,
 
         // Padrões especiais multiplicam o valor base
-        'horizontal_line' => 2.0,
-        'vertical_line' => 2.0,
-        'diagonal' => 3.0,
-        'corners' => 4.0, // 4 cantos iguais
+        'horizontal_line' => 1.5,
+        'vertical_line' => 1.5,
+        'diagonal' => 2.0,
+        'corners' => 2.5, // 4 cantos iguais
     ];
 
     private $userId;
@@ -95,8 +95,8 @@ class ScratchCardService
             'three_symbols' => 30,     
             'horizontal_line' => 0.1,   
             'vertical_line' => 0.1,     
-            'diagonal' => 0.00000001,          
-            'corners' => 0.0000001,            
+            'diagonal' => 0,          
+            'corners' => 0,            
         ];
 
         $rand = rand(1, 100);
@@ -274,11 +274,11 @@ class ScratchCardService
                 100 => 20,
                 200 => 10,
                 500 => 4,
-                1000 => 0.00000001,
-                2000 => 0.00000001,
-                5000 => 0.00000001,
-                10000 => 0.00000001,
-                20000 => 0.00000001
+                1000 => 1,
+                2000 => 1,
+                5000 => 0,
+                10000 => 0,
+                20000 => 0
             ];
         }
 

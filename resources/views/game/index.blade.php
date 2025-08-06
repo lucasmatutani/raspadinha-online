@@ -392,9 +392,9 @@
                 <h3>CONTEÚDO DESSA RASPADINHA:</h3>
                 <ul>
                     <li>Raspe 3 símbolos iguais e ganhe o valor correspondente</li>
-                    <li>Linha completa multiplica o prêmio por 2x</li>
-                    <li>Diagonal completa multiplica o prêmio por 3x</li>
-                    <li>4 cantos iguais multiplica o prêmio por 4x</li>
+                    <li>Linha completa multiplica o prêmio por 1.5x</li>
+                    <li>Diagonal completa multiplica o prêmio por 2x</li>
+                    <li>4 cantos iguais multiplica o prêmio por 2.5x</li>
                     <li>Prêmios de R$ 0,50 até R$ 2.000,00</li>
                     <li>Cada raspadinha custa apenas R$ {{ number_format($betAmount, 2, ',', '.') }}</li>
                 </ul>
