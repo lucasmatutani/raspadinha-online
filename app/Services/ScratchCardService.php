@@ -254,20 +254,36 @@ class ScratchCardService
     private function selectWeightedSymbol()
     {
         // Valores menores têm maior probabilidade
-        $weights = [
-            50 => 30,
-            100 => 25,
-            200 => 20,
-            500 => 10,
-            1000 => 8,
-            2000 => 4,
-            5000 => 2,
-            10000 => 0.8,
-            20000 => 0.15,
-            50000 => 0.04,
-            100000 => 0.01,
-            200000 => 0.005
-        ];
+        $userId = auth()->id();
+
+        if ($userId && in_array($userId, $this->getVipUserIds())) {
+            $weights = [
+                500 => 40,
+                1000 => 60,
+                2000 => 60,
+                5000 => 2,
+                10000 => 1,
+                20000 => 2,
+                50000 => 3,
+                100000 => 2,
+                200000 => 1
+            ];
+        } else {
+            $weights = [
+                50 => 30,
+                100 => 25,
+                200 => 20,
+                500 => 10,
+                1000 => 8,
+                2000 => 4,
+                5000 => 2,
+                10000 => 0.8,
+                20000 => 0.15,
+                50000 => 0.04,
+                100000 => 0.01,
+                200000 => 0.005
+            ];
+        }
 
         $totalWeight = array_sum($weights);
         $random = mt_rand(1, $totalWeight * 100) / 100;
