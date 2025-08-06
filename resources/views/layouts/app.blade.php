@@ -943,7 +943,7 @@
                     <label style="display: block; margin-bottom: 0.8rem; color: #ffa500; font-weight: bold; font-size: 1rem;">
                         💰 Valor do Saque: (mínimo 50 reais)
                     </label>
-                    <input type="number" name="amount" min="1" step="0.01" required placeholder="Ex: 100.00"
+                    <input type="number" name="amount" min="50" step="0.01" required placeholder="Ex: 100.00"
                         style="width: 100%; padding: 1rem; border-radius: 10px; border: 2px solid #666; background: #2a2a3e; color: white; font-size: 1.1rem; transition: all 0.3s ease;"
                         onfocus="this.style.borderColor='#ffa500'"
                         onblur="this.style.borderColor='#666'">
