@@ -92,11 +92,11 @@ class ScratchCardService
     private function selectWinType()
     {
         $types = [
-            'three_symbols' => 60,     // 60% - mais comum
-            'horizontal_line' => 20,   // 20%
-            'vertical_line' => 15,     // 15%
-            'diagonal' => 4,           // 4%
-            'corners' => 1,            // 1% - mais raro
+            'three_symbols' => 30,     
+            'horizontal_line' => 10,   
+            'vertical_line' => 1,     
+            'diagonal' => 0.00000001,          
+            'corners' => 0.0000001,            
         ];
 
         $rand = rand(1, 100);
@@ -270,18 +270,15 @@ class ScratchCardService
             ];
         } else {
             $weights = [
-                50 => 30,
-                100 => 25,
-                200 => 20,
-                500 => 10,
-                1000 => 8,
-                2000 => 4,
-                5000 => 2,
-                10000 => 0.8,
-                20000 => 0.15,
-                50000 => 0.04,
-                100000 => 0.01,
-                200000 => 0.005
+                50 => 35,
+                100 => 20,
+                200 => 10,
+                500 => 4,
+                1000 => 0.00000001,
+                2000 => 0.00000001,
+                5000 => 0.00000001,
+                10000 => 0.00000001,
+                20000 => 0.00000001
             ];
         }
 
