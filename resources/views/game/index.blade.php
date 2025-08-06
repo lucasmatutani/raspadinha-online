@@ -435,7 +435,7 @@
     @push('scripts')
         <script>
             // Variáveis do jogo
-            let currentBalance = {{ auth()->user()->wallet->balance }};
+            let currentBalance = {{ auth()->user()->wallet ? auth()->user()->wallet->balance : 0 }};
             let betAmount = {{ $betAmount }};
             let gameData = null;
             let isPlaying = false;

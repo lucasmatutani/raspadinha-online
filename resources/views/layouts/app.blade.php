@@ -670,6 +670,7 @@
         @auth
         <!-- Desktop user info -->
         <div class="user-info">
+            @if(auth()->user()->wallet)
             <div class="balance" id="balance">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
@@ -677,15 +678,20 @@
             <div class="rollover-info" style="font-size: 0.8rem; color: #ffa500; margin: 0.2rem 0;">
                 Rollover: {{ number_format(auth()->user()->wallet->getRolloverPercentage(), 1) }}%
                 @if(!auth()->user()->wallet->checkCanWithdraw())
-                    <span style="color: #ff6b6b;">(R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }} restante)</span>
+                    <span style="color: #ff6b6b;">(R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }} restante para sacar)</span>
                 @else
                     <span style="color: #51cf66;">✓ Completo</span>
                 @endif
             </div>
             @endif
+            @else
+            <div class="balance" id="balance">
+                R$ 0,00
+            </div>
+            @endif
             <a href="#" class="btn" onclick="openDepositModal()">Depositar</a>
             <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" 
-               @if(!auth()->user()->wallet->checkCanWithdraw()) 
+               @if(auth()->user()->wallet && !auth()->user()->wallet->checkCanWithdraw()) 
                    style="opacity: 0.6; cursor: not-allowed;" 
                    title="Complete o rollover para sacar"
                @endif>Sacar</a>
@@ -703,6 +709,7 @@
 
         <!-- Mobile user info -->
         <div class="mobile-user-info">
+            @if(auth()->user()->wallet)
             <div class="balance" id="balance-mobile">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
@@ -714,6 +721,11 @@
                 @else
                     <span style="color: #51cf66;">✓ Completo</span>
                 @endif
+            </div>
+            @endif
+            @else
+            <div class="balance" id="balance-mobile">
+                R$ 0,00
             </div>
             @endif
             <a href="#" class="btn btn-primary" onclick="openDepositModal()">Depositar</a>
@@ -728,7 +740,7 @@
 
                 <div class="dropdown-menu" id="dropdownMenu">
                     <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" 
-                       @if(!auth()->user()->wallet->checkCanWithdraw()) 
+                       @if(auth()->user()->wallet && !auth()->user()->wallet->checkCanWithdraw()) 
                            style="opacity: 0.6; cursor: not-allowed;" 
                            title="Complete o rollover para sacar"
                        @endif>💰 Sacar</a>
@@ -936,10 +948,7 @@
                         onfocus="this.style.borderColor='#ffa500'"
                         onblur="this.style.borderColor='#666'">
                     <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #999;">
-                        Saldo disponível: R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }} 
-
-
-
+                        Saldo disponível: R$ {{ auth()->user()->wallet ? number_format(auth()->user()->wallet->balance, 2, ',', '.') : '0,00' }}
                     </div>
                 </div>
 
@@ -1455,7 +1464,7 @@
 
         // Funções globais para modal de saque
         function openWithdrawModal() {
-            @if(!auth()->user()->wallet->checkCanWithdraw())
+            @if(auth()->check() && auth()->user()->wallet && !auth()->user()->wallet->checkCanWithdraw())
                 const remaining = {{ auth()->user()->wallet->getRemainingRollover() }};
                 const percentage = {{ auth()->user()->wallet->getRolloverPercentage() }};
                 
