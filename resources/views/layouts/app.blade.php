@@ -684,6 +684,7 @@
             <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" >Sacar</a>
             <a href="#" class="btn btn-affiliate" id="affiliateBtn">🤝 Afiliado</a>
             <a href="{{ route('game.history') }}" class="btn">Histórico</a>
+            <a href="https://t.me/lucasifm" target="_blank" class="btn" style="background: #0088cc; border-color: #0088cc;">💬 Suporte</a>
 
             <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}" style="display: inline;">
@@ -724,6 +725,7 @@
                        @endif>💰 Sacar</a>
                     <a href="#" class="btn btn-affiliate" id="affiliateBtnMobile">🤝 Afiliado</a>
                     <a href="{{ route('game.history') }}" class="btn">📊 Histórico</a>
+                    <a href="https://t.me/lucasifm" target="_blank" class="btn" style="background: #0088cc; border-color: #0088cc;">💬 Suporte</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="btn" style="background: none; border: 1px solid #666; color: #999;">
