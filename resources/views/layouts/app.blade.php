@@ -674,27 +674,14 @@
             <div class="balance" id="balance">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
-            @if(auth()->user()->wallet->rollover_requirement > 0)
-            <div class="rollover-info" style="font-size: 0.8rem; color: #ffa500; margin: 0.2rem 0;">
-                Rollover: {{ number_format(auth()->user()->wallet->getRolloverPercentage(), 1) }}%
-                @if(!auth()->user()->wallet->checkCanWithdraw())
-                    <span style="color: #ff6b6b;">(R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }} restante para sacar)</span>
-                @else
-                    <span style="color: #51cf66;">✓ Completo</span>
-                @endif
-            </div>
-            @endif
+
             @else
             <div class="balance" id="balance">
                 R$ 0,00
             </div>
             @endif
             <a href="#" class="btn" onclick="openDepositModal()">Depositar</a>
-            <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" 
-               @if(auth()->user()->wallet && !auth()->user()->wallet->checkCanWithdraw()) 
-                   style="opacity: 0.6; cursor: not-allowed;" 
-                   title="Complete o rollover para sacar"
-               @endif>Sacar</a>
+            <a href="#" class="btn btn-warning" onclick="openWithdrawModal()" >Sacar</a>
             <a href="#" class="btn btn-affiliate" id="affiliateBtn">🤝 Afiliado</a>
             <a href="{{ route('game.history') }}" class="btn">Histórico</a>
 
@@ -713,16 +700,7 @@
             <div class="balance" id="balance-mobile">
                 R$ {{ number_format(auth()->user()->wallet->balance, 2, ',', '.') }}
             </div>
-            @if(auth()->user()->wallet->rollover_requirement > 0)
-            <div class="rollover-info" style="font-size: 0.7rem; color: #ffa500; margin: 0.2rem 0; text-align: center;">
-                Rollover: {{ number_format(auth()->user()->wallet->getRolloverPercentage(), 1) }}%
-                @if(!auth()->user()->wallet->checkCanWithdraw())
-                    <span style="color: #ff6b6b;">(R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }} restante)</span>
-                @else
-                    <span style="color: #51cf66;">✓ Completo</span>
-                @endif
-            </div>
-            @endif
+
             @else
             <div class="balance" id="balance-mobile">
                 R$ 0,00
@@ -935,6 +913,41 @@
                 </button>
             </div>
 
+            @if(auth()->user()->wallet && auth()->user()->wallet->rollover_requirement > 0)
+            <!-- Explicação do Rollover -->
+            <div style="background: linear-gradient(135deg, #2a2a3e, #1a1a2e); border: 2px solid #ffa500; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 5px 20px rgba(255,165,0,0.2);">
+                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 1.5rem; margin-right: 0.5rem;">🎯</span>
+                    <h4 style="color: #ffa500; margin: 0; font-size: 1.1rem; font-weight: bold;">Sistema de Rollover</h4>
+                </div>
+                
+                <div style="color: #e0e0e0; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem;">
+                    Para liberar o saque, você precisa <strong style="color: #ffa500;">apostar pelo menos o valor total que depositou</strong>. Isso garante a segurança e integridade da plataforma.
+                </div>
+                
+                <div style="background: rgba(255,165,0,0.1); border-radius: 10px; padding: 1rem; border-left: 4px solid #ffa500;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #ccc; font-size: 0.9rem;">Progresso do Rollover:</span>
+                        <span style="color: #ffa500; font-weight: bold;">{{ number_format(auth()->user()->wallet->getRolloverPercentage(), 1) }}%</span>
+                    </div>
+                    
+                    <div style="background: #333; border-radius: 10px; height: 8px; overflow: hidden; margin-bottom: 0.5rem;">
+                        <div style="background: linear-gradient(90deg, #ffa500, #ff6b35); height: 100%; width: {{ auth()->user()->wallet->getRolloverPercentage() }}%; transition: width 0.3s ease;"></div>
+                    </div>
+                    
+                    @if(!auth()->user()->wallet->checkCanWithdraw())
+                    <div style="color: #ff6b6b; font-size: 0.9rem; text-align: center;">
+                        <strong>Faltam R$ {{ number_format(auth()->user()->wallet->getRemainingRollover(), 2, ',', '.') }}</strong> em apostas para liberar o saque
+                    </div>
+                    @else
+                    <div style="color: #51cf66; font-size: 0.9rem; text-align: center; font-weight: bold;">
+                        ✅ Rollover completo! Você pode sacar normalmente
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
+
             <!-- Formulário -->
             <form id="withdrawForm">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -984,7 +997,15 @@
 
                 <!-- Botões -->
                 <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <button type="submit" class="btn btn-warning" style="flex: 1; padding: 1rem; font-size: 1.1rem; font-weight: bold;">
+                    <button type="submit" class="btn btn-warning" 
+                        @if(auth()->user()->wallet && auth()->user()->wallet->rollover_requirement > 0 && !auth()->user()->wallet->checkCanWithdraw())
+                            disabled
+                            style="flex: 1; padding: 1rem; font-size: 1.1rem; font-weight: bold; opacity: 0.5; cursor: not-allowed; background: #666; border-color: #666;"
+                            title="Complete o rollover para liberar o saque"
+                        @else
+                            style="flex: 1; padding: 1rem; font-size: 1.1rem; font-weight: bold;"
+                        @endif
+                    >
                         💸 Solicitar Saque
                     </button>
                     <button type="button" class="btn" onclick="closeWithdrawModal()" style="flex: 0 0 auto; padding: 1rem;">
@@ -1464,14 +1485,6 @@
 
         // Funções globais para modal de saque
         function openWithdrawModal() {
-            @if(auth()->check() && auth()->user()->wallet && !auth()->user()->wallet->checkCanWithdraw())
-                const remaining = {{ auth()->user()->wallet->getRemainingRollover() }};
-                const percentage = {{ auth()->user()->wallet->getRolloverPercentage() }};
-                
-                alert(`Você precisa apostar mais R$ ${remaining.toFixed(2).replace('.', ',')} para liberar o saque.\nProgresso do rollover: ${percentage.toFixed(1)}%`);
-                return;
-            @endif
-            
             document.getElementById('withdrawModal').style.display = 'block';
             // Fechar menu hambúrguer se estiver aberto
             document.getElementById('dropdownMenu').classList.remove('active');
