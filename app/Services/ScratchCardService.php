@@ -117,7 +117,8 @@ class ScratchCardService
         // Escolher valor vencedor com probabilidade baseada no valor
         $winningValue = $this->selectWeightedSymbol();
 
-        $grid = $this->createRandomGrid();
+        // Criar grid limpo sem o valor do prêmio
+        $grid = $this->createCleanRandomGrid($winningValue);
 
         // Colocar 3 símbolos iguais em posições aleatórias
         $positions = $this->getRandomPositions(3);
@@ -138,9 +139,9 @@ class ScratchCardService
 
     private function createHorizontalLine()
     {
-        $grid = $this->createRandomGrid();
-        $lineIndex = rand(0, 2);
         $value = $this->selectWeightedSymbol();
+        $grid = $this->createCleanRandomGrid($value);
+        $lineIndex = rand(0, 2);
 
         // Preencher linha inteira
         for ($col = 0; $col < 3; $col++) {
@@ -159,9 +160,9 @@ class ScratchCardService
 
     private function createVerticalLine()
     {
-        $grid = $this->createRandomGrid();
-        $colIndex = rand(0, 2);
         $value = $this->selectWeightedSymbol();
+        $grid = $this->createCleanRandomGrid($value);
+        $colIndex = rand(0, 2);
 
         // Preencher coluna inteira
         for ($row = 0; $row < 3; $row++) {
@@ -180,8 +181,8 @@ class ScratchCardService
 
     private function createDiagonal()
     {
-        $grid = $this->createRandomGrid();
         $value = $this->selectWeightedSymbol();
+        $grid = $this->createCleanRandomGrid($value);
 
         if (rand(0, 1)) {
             // Diagonal principal
@@ -207,8 +208,8 @@ class ScratchCardService
 
     private function createCorners()
     {
-        $grid = $this->createRandomGrid();
         $value = $this->selectWeightedSymbol();
+        $grid = $this->createCleanRandomGrid($value);
 
         // 4 cantos
         $grid[0][0] = $value;
@@ -341,6 +342,46 @@ class ScratchCardService
                 $grid[$row][$col] = self::SYMBOLS[array_rand(self::SYMBOLS)];
             }
         }
+        return $grid;
+    }
+
+    /**
+     * Cria um grid base garantindo que não há valores repetidos
+     * exceto aqueles que serão definidos como prêmio
+     */
+    private function createCleanRandomGrid($excludeValue = null)
+    {
+        $availableSymbols = self::SYMBOLS;
+        
+        // Remove o valor do prêmio dos símbolos disponíveis se especificado
+        if ($excludeValue !== null) {
+            $availableSymbols = array_filter($availableSymbols, function($symbol) use ($excludeValue) {
+                return $symbol !== $excludeValue;
+            });
+        }
+        
+        $grid = [];
+        $usedValues = [];
+        
+        for ($row = 0; $row < 3; $row++) {
+            for ($col = 0; $col < 3; $col++) {
+                // Tenta encontrar um valor que não foi usado ainda
+                $attempts = 0;
+                do {
+                    $value = $availableSymbols[array_rand($availableSymbols)];
+                    $attempts++;
+                } while (in_array($value, $usedValues) && $attempts < 20);
+                
+                $grid[$row][$col] = $value;
+                $usedValues[] = $value;
+                
+                // Se usamos todos os símbolos disponíveis, resetamos a lista
+                if (count($usedValues) >= count($availableSymbols)) {
+                    $usedValues = [];
+                }
+            }
+        }
+        
         return $grid;
     }
 
