@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/afiliate_manager/UmFzcGFkaW5oYQ==', [AffiliateManagerController::class, 'index'])->name('affiliate.manager');
     Route::post('/affiliate_manager/{id}/commission', [AffiliateManagerController::class, 'updateCommissionRate'])->name('affiliate.update.commission');
     Route::post('/affiliate_manager/{id}/status', [AffiliateManagerController::class, 'updateStatus'])->name('affiliate.update.status');
+    Route::post('/affiliate_manager/{id}/reset-commissions', [AffiliateManagerController::class, 'resetCommissions'])->name('affiliate.reset.commissions');
 });
 
 Route::middleware('auth')->group(function () {

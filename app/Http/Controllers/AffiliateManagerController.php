@@ -105,4 +105,44 @@ class AffiliateManagerController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Zera as comissões de um afiliado
+     */
+    public function resetCommissions($id)
+    {
+        try {
+            $affiliate = Affiliate::findOrFail($id);
+            
+            DB::transaction(function() use ($affiliate) {
+                // Zerar ganhos totais e pendentes
+                $affiliate->total_earnings = 0;
+                $affiliate->pending_earnings = 0;
+                $affiliate->save();
+                
+                // Zerar todas as comissões relacionadas
+                $affiliate->commissions()->delete();
+                
+                // Zerar comissões dos referrals
+                $affiliate->referrals()->update([
+                    'total_commission' => 0
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Comissões zeradas com sucesso',
+                'data' => [
+                    'id' => $affiliate->id,
+                    'total_earnings' => 0,
+                    'pending_earnings' => 0,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao zerar comissões: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

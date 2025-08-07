@@ -150,6 +150,23 @@
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     }
 
+    .reset-btn {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 0.5rem;
+    }
+
+    .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+
     .toggle-referrals {
         background: rgba(0, 255, 135, 0.1);
         border: 1px solid rgba(0, 255, 135, 0.2);
@@ -228,6 +245,7 @@
                                 </select>
                             </div>
                             <button type="submit" class="save-btn ms-3">Salvar</button>
+                            <button type="button" class="reset-btn" onclick="resetCommissions({{ $affiliate['id'] }})">Zerar Comissões</button>
                         </form>
                     </div>
                 </div>
@@ -303,6 +321,90 @@
             button.innerHTML = `<span class="toggle-icon">-</span> Ocultar Afiliados`;
         }
     }
+
+    function resetCommissions(affiliateId) {
+        if (!confirm('Tem certeza que deseja zerar todas as comissões deste afiliado? Esta ação não pode ser desfeita.')) {
+            return;
+        }
+
+        fetch(`/affiliate_manager/${affiliateId}/reset-commissions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Comissões zeradas com sucesso', 'success');
+                // Atualizar os valores na interface
+                const affiliateCard = document.getElementById(`affiliate-${affiliateId}`);
+                const totalEarnings = affiliateCard.querySelector('.stat-box:nth-child(2) .stat-value');
+                const pendingEarnings = affiliateCard.querySelector('.stat-box:nth-child(3) .stat-value');
+                
+                if (totalEarnings) totalEarnings.textContent = 'R$ 0,00';
+                if (pendingEarnings) pendingEarnings.textContent = 'R$ 0,00';
+            } else {
+                showNotification(data.message || 'Erro ao zerar comissões', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showNotification('Erro de conexão. Tente novamente.', 'error');
+        });
+    }
+
+    function showNotification(message, type) {
+        // Criar elemento de notificação
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        `;
+        
+        if (type === 'success') {
+            notification.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
+        } else {
+            notification.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+        }
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Remover após 3 segundos
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Adicionar CSS para animações
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
 
     // Atualizar taxa de comissão e status
     document.querySelectorAll('.commission-form').forEach(form => {
