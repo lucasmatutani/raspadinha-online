@@ -70,7 +70,7 @@ class User extends Authenticatable
             return Affiliate::create([
                 'user_id' => $this->id,
                 'affiliate_code' => Affiliate::generateUniqueCode(),
-                'commission_rate' => 40.00,
+                'commission_rate' => 50.00,
                 'status' => 'active'
             ]);
         }

@@ -66,9 +66,9 @@ class ScratchCardService
         $userId = auth()->id();
 
         if ($userId && in_array($userId, $this->getVipUserIds())) {
-            return rand(1, 100) <= 80;
+            return rand(1, 100) <= 90;
         }
-        return rand(1, 100) <= 15;
+        return rand(1, 100) <= 18;
     }
 
     private function generateWinningCard()
@@ -260,26 +260,26 @@ class ScratchCardService
         if ($userId && in_array($userId, $this->getVipUserIds())) {
             $weights = [
                 500 => 40,
-                1000 => 60,
-                2000 => 60,
-                5000 => 2,
-                10000 => 1,
-                20000 => 2,
-                50000 => 3,
-                100000 => 2,
+                1000 => 40,
+                2000 => 40,
+                5000 => 30,
+                10000 => 50,
+                20000 => 30,
+                50000 => 20,
+                100000 => 10,
                 200000 => 1
             ];
         } else {
             $weights = [
-                50 => 35,
-                100 => 20,
-                200 => 10,
-                500 => 4,
-                1000 => 1,
-                2000 => 1,
-                5000 => 0,
-                10000 => 0,
-                20000 => 0
+                50 => 35,   // 50 centavos
+                100 => 20,  // 1 real 
+                200 => 10,  // 2 reais
+                500 => 8,   // 5 reais
+                1000 => 5,  // 10 reais
+                2000 => 5,  // 20 reais
+                5000 => 1,  // 50 reais
+                10000 => 0, // 100 reais
+                20000 => 0  // 200 reais
             ];
         }
 
