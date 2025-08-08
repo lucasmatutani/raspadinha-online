@@ -891,14 +891,80 @@
         document.querySelectorAll('.btn-save').forEach(button => {
             button.addEventListener('click', function() {
                 const affiliateId = this.getAttribute('data-affiliate-id');
-                const commissionInput = document.querySelector(`[data-affiliate-id="${affiliateId}"] .commission-input`);
-                const statusSelect = document.querySelector(`[data-affiliate-id="${affiliateId}"] .status-toggle`);
+                
+                // Buscar inputs tanto na versão desktop quanto mobile
+                let commissionInput = document.querySelector(`form[data-affiliate-id="${affiliateId}"] .commission-input`);
+                if (!commissionInput) {
+                    commissionInput = document.querySelector(`.commission-mobile-form[data-affiliate-id="${affiliateId}"] .commission-input`);
+                }
+                
+                const statusSelect = document.querySelector(`select.status-toggle[data-affiliate-id="${affiliateId}"]`);
+                
+                if (!commissionInput || !statusSelect) {
+                    showNotification('Erro: Elementos não encontrados', 'error');
+                    return;
+                }
                 
                 const commissionRate = commissionInput.value;
                 const status = statusSelect.value;
                 
-                // Simular salvamento (aqui você faria a requisição AJAX)
-                showNotification('Configurações salvas com sucesso!', 'success');
+                // Validar taxa de comissão
+                if (commissionRate < 0 || commissionRate > 100) {
+                    showNotification('Taxa de comissão deve estar entre 0 e 100', 'error');
+                    return;
+                }
+                
+                // Desabilitar botão durante o salvamento
+                this.disabled = true;
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                
+                // Atualizar taxa de comissão
+                fetch(`/affiliate_manager/${affiliateId}/commission`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        commission_rate: commissionRate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Atualizar status
+                        return fetch(`/affiliate_manager/${affiliateId}/status`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                status: status
+                            })
+                        });
+                    } else {
+                        throw new Error(data.message || 'Erro ao atualizar taxa de comissão');
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Configurações salvas com sucesso!', 'success');
+                    } else {
+                        throw new Error(data.message || 'Erro ao atualizar status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    showNotification(error.message || 'Erro ao salvar configurações', 'error');
+                })
+                .finally(() => {
+                    // Reabilitar botão
+                    this.disabled = false;
+                    this.innerHTML = originalText;
+                });
             });
         });
         
