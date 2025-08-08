@@ -491,6 +491,34 @@
         padding: 20px;
         max-height: 60vh;
         overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    .modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #00ff87, #00d4aa);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #00d4aa, #00ff87);
+        transform: scale(1.1);
+    }
+
+    /* Firefox scrollbar */
+    .modal-body {
+        scrollbar-width: thin;
+        scrollbar-color: #00ff87 rgba(255, 255, 255, 0.1);
     }
 
     .referrals-table {
