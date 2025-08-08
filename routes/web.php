@@ -22,6 +22,14 @@ Route::get('/', function () {
     return redirect()->route('game.index');
 });
 
+// Rota admin que redireciona para login
+Route::get('/admin', function () {
+    if (auth()->check()) {
+        return redirect()->route('admin.demo-accounts');
+    }
+    return redirect()->route('login');
+})->name('admin');
+
 // Rotas do jogo (públicas - qualquer um pode ver, mas só logados podem jogar)
 Route::get('/game', [GameController::class, 'index'])->name('game.index');
 

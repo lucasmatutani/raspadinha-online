@@ -30,6 +30,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Verificar se é admin e redirecionar adequadamente
+        $adminIds = [1]; // IDs dos usuários administradores
+        
+        if (in_array(auth()->id(), $adminIds)) {
+            return redirect()->intended(route('admin.demo-accounts'));
+        }
+
         // REDIRECIONAR PARA O JOGO EM VEZ DO DASHBOARD
         return redirect()->intended(route('game.index'));
     }

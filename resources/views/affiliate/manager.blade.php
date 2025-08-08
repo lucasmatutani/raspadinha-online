@@ -1,7 +1,7 @@
 <!-- resources/views/affiliate/manager.blade.php -->
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Gerenciador de Afiliados - RaspaKing')
+@section('title', 'Gerenciador de Afiliados')
 
 @push('styles')
 <style>
@@ -215,10 +215,13 @@
 @endpush
 
 @section('content')
-<div class="container">
+<div class="admin-container">
+    <div class="admin-header-content">
+        <h1 class="admin-title">🤝 Gerenciador de Afiliados</h1>
+        <p class="admin-subtitle">Gerencie os afiliados que possuem mais de um afiliado registrado</p>
+    </div>
+
     <div class="affiliate-manager">
-        <h1>Gerenciador de Afiliados</h1>
-        <p class="mb-4">Gerencie os afiliados que possuem mais de um afiliado registrado.</p>
 
         @if(count($affiliates) > 0)
             @foreach($affiliates as $affiliate)
