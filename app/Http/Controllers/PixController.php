@@ -235,11 +235,6 @@ class PixController extends Controller
                 'callback_data' => $callbackData,
             ]);
 
-            Log::info('Callback de withdraw processado', [
-                'transaction_id' => $callbackData['transaction_id'],
-                'status' => $callbackData['status']
-            ]);
-
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error('Erro no callback de withdraw', [

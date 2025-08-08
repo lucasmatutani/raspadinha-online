@@ -201,12 +201,6 @@ class GameController extends Controller
                 // Não incrementamos total_commission nem pending_earnings
             });
 
-            Log::info('Perda registrada com sucesso (sem comissão)', [
-                'user_id' => $userId,
-                'affiliate_id' => $affiliate->id,
-                'loss_amount' => $lossAmount
-            ]);
-
             return true;
 
         } catch (\Exception $e) {
