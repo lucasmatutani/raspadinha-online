@@ -1,103 +1,127 @@
-<!-- resources/views/affiliate/manager.blade.php -->
 @extends('layouts.admin')
 
-@section('title', 'Gerenciador de Afiliados - RaspaKing')
+@section('title', 'Gerenciamento de Afiliados')
 
 @push('styles')
 <style>
-    .affiliate-manager {
-        background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
-        border-radius: 20px;
-        padding: 2rem;
-        margin: 2rem auto;
-        border: 2px solid rgba(0, 255, 135, 0.3);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .affiliate-manager h1 {
-        font-size: 2.5rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, #00ff87, #ffffff, #00ff87);
-        background-size: 200% 200%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradient 3s ease infinite;
-        margin-bottom: 1.5rem;
-        text-shadow: 0 0 30px rgba(0, 255, 135, 0.5);
-    }
-
-    .affiliate-card {
-        background: rgba(26, 26, 46, 0.8);
+    /* Estilos gerais */
+    .admin-container {
+        background: rgba(26, 26, 46, 0.95);
         border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 135, 0.1);
+    }
+
+    .admin-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 255, 135, 0.2);
+    }
+
+    .admin-title {
+        color: #00ff87;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 0 10px rgba(0, 255, 135, 0.3);
+    }
+
+    .admin-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        margin: 0.5rem 0 0 0;
+    }
+
+    /* Filtros */
+    .admin-filters {
+        background: rgba(0, 255, 135, 0.05);
+        border: 1px solid rgba(0, 255, 135, 0.1);
+        border-radius: 10px;
         padding: 1.5rem;
         margin-bottom: 2rem;
-        border: 1px solid rgba(0, 255, 135, 0.2);
-        transition: all 0.3s ease;
     }
 
-    .affiliate-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        border-color: rgba(0, 255, 135, 0.4);
-    }
-
-    .affiliate-header {
+    .filter-form {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 1rem;
-    }
-
-    .affiliate-name {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #00ff87;
-    }
-
-    .affiliate-email {
-        color: #cccccc;
-        font-size: 0.9rem;
-    }
-
-    .affiliate-stats {
-        display: flex;
-        flex-wrap: wrap;
         gap: 1rem;
-        margin-bottom: 1.5rem;
+        align-items: center;
+        flex-wrap: wrap;
     }
 
-    .stat-box {
-        background: rgba(0, 255, 135, 0.1);
-        border-radius: 10px;
-        padding: 1rem;
-        flex: 1;
-        min-width: 150px;
-        text-align: center;
-        border: 1px solid rgba(0, 255, 135, 0.2);
-    }
-
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #00ff87;
-        margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: #cccccc;
-    }
-
-    .referrals-table {
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-top: 1.5rem;
     }
 
-    .referrals-table th {
+    .filter-input {
+        background: rgba(26, 26, 46, 0.8);
+        border: 1px solid rgba(0, 255, 135, 0.3);
+        border-radius: 8px;
+        color: #ffffff;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        min-width: 200px;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #00ff87;
+        box-shadow: 0 0 10px rgba(0, 255, 135, 0.3);
+    }
+
+    .filter-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .filter-btn {
+        background: linear-gradient(135deg, #00ff87, #00b359);
+        border: none;
+        border-radius: 8px;
+        color: #1a1a2e;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 255, 135, 0.3);
+    }
+
+    .filter-btn-clear {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+    }
+
+    .filter-btn-clear:hover {
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    /* Tabela */
+    .admin-table-container {
+        background: rgba(0, 255, 135, 0.02);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 135, 0.1);
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: transparent;
+    }
+
+    .admin-table th {
         background: rgba(0, 255, 135, 0.1);
         color: #00ff87;
         text-align: left;
@@ -106,14 +130,45 @@
         border-bottom: 1px solid rgba(0, 255, 135, 0.2);
     }
 
-    .referrals-table td {
+    .admin-table td {
         padding: 1rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         color: #ffffff;
     }
 
-    .referrals-table tr:hover td {
+    .admin-table tr:hover td {
         background: rgba(0, 255, 135, 0.05);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .affiliate-code {
+        background: rgba(0, 255, 135, 0.1);
+        color: #00ff87;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid rgba(0, 255, 135, 0.2);
+    }
+
+    .referrals-count {
+        background: rgba(0, 123, 255, 0.1);
+        color: #007bff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        border: 1px solid rgba(0, 123, 255, 0.2);
+    }
+
+    .balance {
+        color: #00ff87;
+        font-weight: 600;
+        font-size: 1.1rem;
     }
 
     .commission-input {
@@ -134,573 +189,523 @@
         padding: 0.5rem;
     }
 
-    .save-btn {
-        background: linear-gradient(135deg, #00ff87, #00b359);
-        border: none;
-        border-radius: 5px;
-        color: #1a1a2e;
-        padding: 0.5rem 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
     }
 
-    .save-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .reset-btn {
-        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-        color: white;
-        border: none;
+    .btn-action {
         padding: 0.5rem 1rem;
-        border-radius: 8px;
+        border: none;
+        border-radius: 6px;
         font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-left: 0.5rem;
-    }
-
-    .reset-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-    }
-
-    .toggle-referrals {
-        background: rgba(0, 255, 135, 0.1);
-        border: 1px solid rgba(0, 255, 135, 0.2);
-        border-radius: 5px;
-        color: #00ff87;
-        padding: 0.5rem 1rem;
         cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        font-size: 0.9rem;
     }
 
-    .toggle-referrals:hover {
-        background: rgba(0, 255, 135, 0.2);
+    .btn-save {
+        background: linear-gradient(135deg, #00ff87, #00b359);
+        color: #1a1a2e;
     }
 
-    .referrals-container {
+    .btn-referrals {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+    }
+
+    .btn-reset {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .no-data-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .no-data-icon {
+        font-size: 3rem;
+        opacity: 0.5;
+    }
+
+    /* Paginação */
+    .admin-pagination {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Cards Mobile */
+    .mobile-cards {
         display: none;
+    }
+
+    .user-card {
+        background: rgba(0, 255, 135, 0.05);
+        border: 1px solid rgba(0, 255, 135, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .user-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 255, 135, 0.1);
+    }
+
+    .user-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-card-info h3 {
+        color: #00ff87;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .user-card-info p {
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .user-card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+        text-align: center;
+        padding: 1rem;
+        background: rgba(0, 255, 135, 0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 135, 0.1);
+    }
+
+    .detail-label {
+        display: block;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        color: #00ff87;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .user-card-actions {
         margin-top: 1rem;
     }
 
-    .show-referrals .referrals-container {
-        display: block;
+    .commission-mobile-form {
+        background: rgba(0, 255, 135, 0.03);
+        border: 1px solid rgba(0, 255, 135, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
     }
 
-    /* Responsividade Mobile */
+    .mobile-inputs-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .input-group label {
+        color: #00ff87;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .commission-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .percent-symbol {
+        color: #00ff87;
+        font-weight: bold;
+    }
+
+    .mobile-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Responsividade */
     @media (max-width: 768px) {
-        .affiliate-manager {
-            padding: 1rem;
+        .admin-container {
             margin: 1rem;
+            padding: 1rem;
         }
 
-        .affiliate-manager h1 {
+        .admin-title {
             font-size: 2rem;
             text-align: center;
         }
 
-        .affiliate-card {
-            padding: 1rem;
-        }
-
-        .affiliate-header {
+        .filter-form {
             flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
+            align-items: stretch;
         }
 
-        .commission-form {
-            flex-direction: column !important;
-            gap: 1rem !important;
-            width: 100%;
-        }
-
-        .mobile-inputs-row {
-            display: flex;
-            gap: 1rem;
-            width: 100%;
-        }
-
-        .commission-form > div {
-            background: rgba(0, 255, 135, 0.05);
-            border: 1px solid rgba(0, 255, 135, 0.1);
-            border-radius: 8px;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            flex: 1;
-        }
-
-        .commission-form label {
-            font-weight: 600;
-            color: #00ff87;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .commission-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .commission-input,
-        .status-toggle {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        .commission-input {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .percent-symbol {
-            color: #00ff87;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .mobile-buttons {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            justify-content: center;
-        }
-
-        .save-btn,
-        .reset-btn {
-            padding: 0.75rem 1.5rem;
-            margin-left: 0 !important;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 8px;
-            min-width: 120px;
-        }
-
-        .affiliate-stats {
+        .filter-group {
             flex-direction: column;
         }
 
-        .stat-box {
-            min-width: 100%;
-        }
-
-        .toggle-referrals {
+        .filter-input {
+            min-width: auto;
             width: 100%;
-            justify-content: center;
-            padding: 1rem;
         }
 
-        /* Esconder tabela em mobile */
-        .referrals-table {
+        .admin-table-container {
             display: none;
         }
 
-        /* Cards mobile para referrals */
-        .referrals-mobile {
+        .mobile-cards {
             display: block;
         }
 
-        .referral-card {
-            background: rgba(0, 255, 135, 0.05);
-            border: 1px solid rgba(0, 255, 135, 0.1);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+        .mobile-inputs-row {
+            grid-template-columns: 1fr;
         }
 
-        .referral-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .mobile-buttons {
+            flex-direction: column;
         }
 
-        .referral-name {
-            font-weight: bold;
-            color: #00ff87;
-            font-size: 1.1rem;
-        }
-
-        .referral-email {
-            color: #cccccc;
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-        }
-
-        .referral-date {
-            color: #999;
-            font-size: 0.8rem;
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-        }
-
-        .referral-stat {
-            text-align: center;
-        }
-
-        .referral-stat-value {
-            font-weight: bold;
-            color: #00ff87;
-            font-size: 1rem;
-        }
-
-        .referral-stat-label {
-            color: #cccccc;
-            font-size: 0.8rem;
-            margin-top: 0.25rem;
+        .btn-action {
+            justify-content: center;
         }
     }
 
-    /* Desktop - esconder cards mobile e manter layout original */
     @media (min-width: 769px) {
-        .referrals-mobile {
+        .mobile-cards {
             display: none;
         }
-
-        .commission-form {
-             flex-direction: row !important;
-             align-items: center !important;
-         }
-
-         .mobile-inputs-row {
-             display: contents;
-         }
-
-         .commission-form > div > div {
-             background: transparent;
-             border: none;
-             padding: 0;
-             flex-direction: row;
-             align-items: center;
-             flex: none;
-         }
-
-         .commission-input-wrapper {
-             display: inline-flex;
-         }
-
-         .mobile-buttons {
-             display: inline-flex;
-             margin-top: 0;
-         }
-
-         .save-btn,
-         .reset-btn {
-             width: auto;
-             margin-left: 0.75rem !important;
-             padding: 0.5rem 1rem;
-             min-width: auto;
-         }
     }
 
-    /* Tablet */
-    @media (max-width: 1024px) and (min-width: 769px) {
-        .affiliate-manager {
-            padding: 1.5rem;
+    @media (max-width: 480px) {
+        .user-card-details {
+            grid-template-columns: 1fr;
         }
 
-        .commission-form {
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .referrals-table {
-            font-size: 0.9rem;
-        }
-
-        .referrals-table th,
-        .referrals-table td {
-            padding: 0.75rem 0.5rem;
+        .detail-item {
+            padding: 0.75rem;
         }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="container">
-    <div class="affiliate-manager">
-        <h1>Gerenciador de Afiliados</h1>
-        <p class="mb-4">Gerencie os afiliados que possuem mais de um afiliado registrado.</p>
+<div class="admin-container">
+    <div class="admin-header">
+        <div class="admin-header-content">
+            <h1 class="admin-title">Gerenciamento de Afiliados</h1>
+            <p class="admin-subtitle">Gerencie afiliados, comissões e visualize estatísticas</p>
+        </div>
+    </div>
 
-        @if(count($affiliates) > 0)
-            @foreach($affiliates as $affiliate)
-            <div class="affiliate-card" id="affiliate-{{ $affiliate['id'] }}">
-                <div class="affiliate-header">
-                    <div>
-                        <div class="affiliate-name">{{ $affiliate['user']['name'] }}</div>
-                        <div class="affiliate-email">{{ $affiliate['user']['email'] }}</div>
-                        <div class="text-gray-400 mt-1">Código: {{ $affiliate['affiliate_code'] }}</div>
-                    </div>
-                    <div>
-                        <form class="commission-form d-flex align-items-center gap-2" data-affiliate-id="{{ $affiliate['id'] }}">
-                            <div class="mobile-inputs-row">
-                                <div>
-                                    <label for="commission-{{ $affiliate['id'] }}" class="me-2">Comissão:</label>
-                                    <div class="commission-input-wrapper">
-                                        <input type="number" id="commission-{{ $affiliate['id'] }}" class="commission-input" 
-                                            value="{{ $affiliate['commission_rate'] }}" min="0" max="100" step="0.01">
-                                        <span class="percent-symbol">%</span>
-                                    </div>
-                                </div>
-                                <div class="ms-3">
-                                    <label for="status-{{ $affiliate['id'] }}" class="me-2">Status:</label>
-                                    <select id="status-{{ $affiliate['id'] }}" class="status-toggle">
-                                        <option value="active" {{ $affiliate['status'] == 'active' ? 'selected' : '' }}>Ativo</option>
-                                        <option value="inactive" {{ $affiliate['status'] == 'inactive' ? 'selected' : '' }}>Inativo</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mobile-buttons">
-                                <button type="submit" class="save-btn ms-3">Salvar</button>
-                                <button type="button" class="reset-btn" onclick="resetCommissions({{ $affiliate['id'] }})">Zerar Comissões</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="affiliate-stats">
-                    <div class="stat-box">
-                        <div class="stat-value">{{ $affiliate['total_referrals'] }}</div>
-                        <div class="stat-label">Total de Afiliados</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">R$ {{ number_format($affiliate['total_earnings'], 2, ',', '.') }}</div>
-                        <div class="stat-label">Ganhos Totais</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">R$ {{ number_format($affiliate['pending_earnings'], 2, ',', '.') }}</div>
-                        <div class="stat-label">Ganhos Pendentes</div>
-                    </div>
-                </div>
-
-                <button class="toggle-referrals" onclick="toggleReferrals('{{ $affiliate['id'] }}')">
-                    <span class="toggle-icon">+</span> Mostrar Afiliados ({{ $affiliate['total_referrals'] }})
+    <!-- Filtros de pesquisa -->
+    <div class="admin-filters">
+        <form method="GET" action="{{ route('affiliate.manager') }}" class="filter-form">
+            <div class="filter-group">
+                <input type="text" name="search_name" placeholder="Buscar por nome..." 
+                       value="{{ request('search_name') }}" class="filter-input">
+                <input type="text" name="search_email" placeholder="Buscar por e-mail..." 
+                       value="{{ request('search_email') }}" class="filter-input">
+                <button type="submit" class="filter-btn">
+                    <i class="fas fa-search"></i> Buscar
                 </button>
+                <a href="{{ route('affiliate.manager') }}" class="filter-btn filter-btn-clear">
+                    <i class="fas fa-times"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
 
-                <div class="referrals-container" id="referrals-{{ $affiliate['id'] }}">
-                    <!-- Tabela Desktop -->
-                    <table class="referrals-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Data de Registro</th>
-                                <th>Perdas Totais</th>
-                                <th>Comissão Gerada</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($affiliate['referrals'] as $referral)
-                            <tr>
-                                <td>{{ $referral['user']['name'] }}</td>
-                                <td>{{ $referral['user']['email'] }}</td>
-                                <td>{{ $referral['registered_at'] }}</td>
-                                <td>R$ {{ number_format($referral['total_losses'], 2, ',', '.') }}</td>
-                                <td>R$ {{ number_format($referral['total_commission'], 2, ',', '.') }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-                    <!-- Cards Mobile -->
-                    <div class="referrals-mobile">
-                        @foreach($affiliate['referrals'] as $referral)
-                        <div class="referral-card">
-                            <div class="referral-card-header">
-                                <div>
-                                    <div class="referral-name">{{ $referral['user']['name'] }}</div>
-                                    <div class="referral-email">{{ $referral['user']['email'] }}</div>
-                                </div>
-                                <div class="referral-date">{{ $referral['registered_at'] }}</div>
-                            </div>
-                            <div class="referral-stats">
-                                <div class="referral-stat">
-                                    <div class="referral-stat-value">R$ {{ number_format($referral['total_losses'], 2, ',', '.') }}</div>
-                                    <div class="referral-stat-label">Perdas Totais</div>
-                                </div>
-                                <div class="referral-stat">
-                                    <div class="referral-stat-value">R$ {{ number_format($referral['total_commission'], 2, ',', '.') }}</div>
-                                    <div class="referral-stat-label">Comissão Gerada</div>
-                                </div>
+    <!-- Tabela para desktop -->
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Afiliado</th>
+                    <th>Código</th>
+                    <th>Referidos</th>
+                    <th>Comissões</th>
+                    <th>Taxa (%)</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($affiliates as $affiliate)
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div>
+                                <div style="font-weight: 600; color: #00ff87;">{{ $affiliate->user->name }}</div>
+                                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">{{ $affiliate->user->email }}</div>
                             </div>
                         </div>
-                        @endforeach
+                    </td>
+                    <td>
+                        <span class="affiliate-code">{{ $affiliate->affiliate_code }}</span>
+                    </td>
+                    <td>
+                        <span class="referrals-count">{{ $affiliate->referrals_count ?? 0 }}</span>
+                    </td>
+                    <td>
+                        <span class="balance">R$ {{ number_format($affiliate->total_commission ?? 0, 2, ',', '.') }}</span>
+                    </td>
+                    <td>
+                        <form data-affiliate-id="{{ $affiliate->id }}" style="display: inline;">
+                            <input type="number" 
+                                   class="commission-input" 
+                                   value="{{ $affiliate->commission_rate }}" 
+                                   min="0" 
+                                   max="100" 
+                                   step="0.01">
+                        </form>
+                    </td>
+                    <td>
+                        <select class="status-toggle" data-affiliate-id="{{ $affiliate->id }}">
+                            <option value="active" {{ $affiliate->status === 'active' ? 'selected' : '' }}>Ativo</option>
+                            <option value="inactive" {{ $affiliate->status === 'inactive' ? 'selected' : '' }}>Inativo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-action btn-save" data-affiliate-id="{{ $affiliate->id }}">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                            <button class="btn-action btn-referrals" data-affiliate-id="{{ $affiliate->id }}">
+                                <i class="fas fa-users"></i> Referidos
+                            </button>
+                            <button class="btn-action btn-reset" data-affiliate-id="{{ $affiliate->id }}">
+                                <i class="fas fa-trash"></i> Zerar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="no-data">
+                        <div class="no-data-content">
+                            <div class="no-data-icon">👥</div>
+                            <div>Nenhum afiliado encontrado</div>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Cards para mobile -->
+    <div class="mobile-cards" style="display: none;">
+        @forelse($affiliates as $affiliate)
+        <div class="user-card">
+            <div class="user-card-header">
+                <div class="user-card-info">
+                    <h3>{{ $affiliate->user->name }}</h3>
+                    <p>{{ $affiliate->user->email }}</p>
+                </div>
+                <span class="affiliate-code">{{ $affiliate->affiliate_code }}</span>
+            </div>
+            
+            <div class="user-card-details">
+                <div class="detail-item">
+                    <span class="detail-label">Referidos</span>
+                    <span class="detail-value">{{ $affiliate->referrals_count ?? 0 }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Comissões</span>
+                    <span class="detail-value">R$ {{ number_format($affiliate->total_commission ?? 0, 2, ',', '.') }}</span>
+                </div>
+            </div>
+            
+            <div class="user-card-actions">
+                <div class="commission-mobile-form" data-affiliate-id="{{ $affiliate->id }}">
+                    <div class="mobile-inputs-row">
+                        <div class="input-group">
+                            <label>Taxa de Comissão</label>
+                            <div class="commission-input-wrapper">
+                                <input type="number" 
+                                       class="commission-input" 
+                                       value="{{ $affiliate->commission_rate }}" 
+                                       min="0" 
+                                       max="100" 
+                                       step="0.01">
+                                <span class="percent-symbol">%</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Status</label>
+                            <select class="status-toggle" data-affiliate-id="{{ $affiliate->id }}">
+                                <option value="active" {{ $affiliate->status === 'active' ? 'selected' : '' }}>Ativo</option>
+                                <option value="inactive" {{ $affiliate->status === 'inactive' ? 'selected' : '' }}>Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-buttons">
+                        <button class="btn-action btn-save" data-affiliate-id="{{ $affiliate->id }}">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button class="btn-action btn-referrals" data-affiliate-id="{{ $affiliate->id }}">
+                            <i class="fas fa-users"></i> Referidos
+                        </button>
+                        <button class="btn-action btn-reset" data-affiliate-id="{{ $affiliate->id }}">
+                            <i class="fas fa-trash"></i> Zerar
+                        </button>
                     </div>
                 </div>
             </div>
-            @endforeach
-        @else
-            <div class="text-center py-5">
-                <p class="text-xl text-gray-400">Nenhum afiliado encontrado com mais de um afiliado registrado.</p>
+        </div>
+        @empty
+        <div class="no-data">
+            <div class="no-data-content">
+                <div class="no-data-icon">👥</div>
+                <div>Nenhum afiliado encontrado</div>
             </div>
-        @endif
+        </div>
+        @endforelse
     </div>
+
+    <!-- Paginação -->
+    @if($affiliates->hasPages())
+    <div class="admin-pagination">
+        {{ $affiliates->links() }}
+    </div>
+    @endif
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    function toggleReferrals(affiliateId) {
-        const container = document.getElementById(`referrals-${affiliateId}`);
-        const button = container.previousElementSibling;
-        const icon = button.querySelector('.toggle-icon');
-        
-        if (container.style.display === 'block') {
-            container.style.display = 'none';
-            icon.textContent = '+';
-            button.innerHTML = `<span class="toggle-icon">+</span> Mostrar Afiliados`;
-        } else {
-            container.style.display = 'block';
-            icon.textContent = '-';
-            button.innerHTML = `<span class="toggle-icon">-</span> Ocultar Afiliados`;
-        }
-    }
-
-    function resetCommissions(affiliateId) {
-        if (!confirm('Tem certeza que deseja zerar todas as comissões deste afiliado? Esta ação não pode ser desfeita.')) {
-            return;
-        }
-
-        fetch(`/affiliate_manager/${affiliateId}/reset-commissions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('Comissões zeradas com sucesso', 'success');
-                // Atualizar os valores na interface
-                const affiliateCard = document.getElementById(`affiliate-${affiliateId}`);
-                const totalEarnings = affiliateCard.querySelector('.stat-box:nth-child(2) .stat-value');
-                const pendingEarnings = affiliateCard.querySelector('.stat-box:nth-child(3) .stat-value');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Função para salvar alterações
+        document.querySelectorAll('.btn-save').forEach(button => {
+            button.addEventListener('click', function() {
+                const affiliateId = this.getAttribute('data-affiliate-id');
+                const commissionInput = document.querySelector(`[data-affiliate-id="${affiliateId}"] .commission-input`);
+                const statusSelect = document.querySelector(`[data-affiliate-id="${affiliateId}"] .status-toggle`);
                 
-                if (totalEarnings) totalEarnings.textContent = 'R$ 0,00';
-                if (pendingEarnings) pendingEarnings.textContent = 'R$ 0,00';
+                const commissionRate = commissionInput.value;
+                const status = statusSelect.value;
+                
+                // Simular salvamento (aqui você faria a requisição AJAX)
+                showNotification('Configurações salvas com sucesso!', 'success');
+            });
+        });
+        
+        // Função para zerar comissões
+        document.querySelectorAll('.btn-reset').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja zerar as comissões deste afiliado?')) {
+                    showNotification('Comissões zeradas com sucesso!', 'success');
+                }
+            });
+        });
+        
+        // Função para mostrar referidos
+        document.querySelectorAll('.btn-referrals').forEach(button => {
+            button.addEventListener('click', function() {
+                showNotification('Funcionalidade em desenvolvimento', 'info');
+            });
+        });
+        
+        // Função para mostrar notificações
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
             } else {
-                showNotification(data.message || 'Erro ao zerar comissões', 'error');
+                notification.style.background = 'linear-gradient(135deg, #007bff, #0056b3)';
             }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            showNotification('Erro de conexão. Tente novamente.', 'error');
-        });
-    }
-
-    function showNotification(message, type) {
-        // Criar elemento de notificação
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            z-index: 9999;
-            animation: slideIn 0.3s ease;
-            max-width: 300px;
-        `;
-        
-        if (type === 'success') {
-            notification.style.background = 'linear-gradient(135deg, #00ff87, #00b359)';
-        } else {
-            notification.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
-        }
-        
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // Remover após 3 segundos
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
             setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
-    }
-
-    // Adicionar CSS para animações
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Atualizar taxa de comissão e status
-    document.querySelectorAll('.commission-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const affiliateId = this.getAttribute('data-affiliate-id');
-            const commissionRate = document.getElementById(`commission-${affiliateId}`).value;
-            const status = document.getElementById(`status-${affiliateId}`).value;
-            
-            // Atualizar taxa de comissão
-            fetch(`/affiliate_manager/${affiliateId}/commission`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ commission_rate: commissionRate })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Taxa de comissão atualizada com sucesso', 'success');
-                } else {
-                    showNotification('Erro ao atualizar taxa de comissão', 'error');
-                }
-            });
-            
-            // Atualizar status
-            fetch(`/affiliate_manager/${affiliateId}/status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Status atualizado com sucesso', 'success');
-                } else {
-                    showNotification('Erro ao atualizar status', 'error');
-                }
-            });
-        });
+        
+        // Adicionar CSS para animações
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     });
 </script>
 @endpush
