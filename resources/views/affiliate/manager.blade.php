@@ -905,8 +905,33 @@
         // Função para zerar comissões
         document.querySelectorAll('.btn-reset').forEach(button => {
             button.addEventListener('click', function() {
+                const affiliateId = this.getAttribute('data-affiliate-id');
+                
                 if (confirm('Tem certeza que deseja zerar as comissões deste afiliado?')) {
-                    showNotification('Comissões zeradas com sucesso!', 'success');
+                    // Fazer requisição AJAX para zerar comissões
+                    fetch(`/affiliate_manager/${affiliateId}/reset-commissions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Comissões zeradas com sucesso!', 'success');
+                            // Recarregar a página para atualizar os valores
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            showNotification(data.message || 'Erro ao zerar comissões', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        showNotification('Erro ao zerar comissões', 'error');
+                    });
                 }
             });
         });
