@@ -9,7 +9,9 @@
         background: rgba(26, 26, 46, 0.95);
         border-radius: 15px;
         padding: 2rem;
-        margin: 2rem;
+        margin: 1rem auto;
+        max-width: 1400px;
+        width: 95%;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         border: 1px solid rgba(0, 255, 135, 0.1);
     }
@@ -111,12 +113,35 @@
     .admin-table-container {
         background: rgba(0, 255, 135, 0.02);
         border-radius: 10px;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: visible;
         border: 1px solid rgba(0, 255, 135, 0.1);
+        margin: 0 auto;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .admin-table-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .admin-table-container::-webkit-scrollbar-track {
+        background: rgba(0, 255, 135, 0.1);
+        border-radius: 4px;
+    }
+    
+    .admin-table-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(90deg, #00ff87, #00d4aa);
+        border-radius: 4px;
+    }
+    
+    .admin-table-container::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(90deg, #00d4aa, #00b359);
     }
 
     .admin-table {
         width: 100%;
+        min-width: 1000px;
         border-collapse: collapse;
         background: transparent;
     }
@@ -264,6 +289,8 @@
         border-radius: 15px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
         transition: all 0.3s ease;
     }
 
@@ -296,7 +323,7 @@
 
     .user-card-details {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
@@ -390,10 +417,22 @@
     }
 
     /* Responsividade */
+    @media (max-width: 1200px) {
+        .admin-container {
+            width: 98%;
+            margin: 0.5rem auto;
+        }
+        
+        .admin-table {
+            min-width: 900px;
+        }
+    }
+    
     @media (max-width: 768px) {
         .admin-container {
-            margin: 1rem;
+            margin: 0.5rem;
             padding: 1rem;
+            width: calc(100% - 1rem);
         }
 
         .admin-title {
@@ -443,12 +482,36 @@
     }
 
     @media (max-width: 480px) {
+        .admin-container {
+            margin: 0.25rem;
+            padding: 0.75rem;
+            width: calc(100% - 0.5rem);
+        }
+        
+        .user-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
         .user-card-details {
             grid-template-columns: 1fr;
+            gap: 0.75rem;
         }
 
         .detail-item {
             padding: 0.75rem;
+        }
+        
+        .admin-title {
+            font-size: 1.75rem;
+        }
+        
+        .filter-input {
+            padding: 0.6rem 0.8rem;
+        }
+        
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
         }
     }
 
