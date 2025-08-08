@@ -23,7 +23,7 @@ class AffiliateManagerController extends Controller
         
         // Buscar afiliados que possuem mais de 1 afiliado
         $affiliates = Affiliate::withCount('referrals')
-            ->having('referrals_count', '>', 1)
+            ->having('referrals_count', '>=', 1)
             ->with(['user:id,name,email', 'referrals.referredUser:id,name,email,created_at'])
             ->get()
             ->map(function($affiliate) {
