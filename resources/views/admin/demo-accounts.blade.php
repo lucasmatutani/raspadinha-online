@@ -27,6 +27,7 @@
 
     <!-- Tabela de usuários -->
     <div class="admin-table-container">
+        <!-- Tabela para desktop -->
         <table class="admin-table">
             <thead>
                 <tr>
@@ -92,6 +93,67 @@
                 @endforelse
             </tbody>
         </table>
+        
+        <!-- Cards para mobile -->
+        <div class="mobile-cards">
+            @forelse($users as $user)
+            <div class="user-card">
+                <div class="user-card-header">
+                    <div class="user-card-info">
+                        <h3>👤 {{ $user->name }}</h3>
+                        <p>📧 {{ $user->email }}</p>
+                        @if($user->demo)
+                            <span class="demo-badge">DEMO</span>
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="user-card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">💰 Saldo</span>
+                        <span class="detail-value balance">R$ {{ number_format($user->wallet->balance ?? 0, 2, ',', '.') }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">📅 Cadastro</span>
+                        <span class="detail-value">{{ $user->created_at->format('d/m/Y H:i') }}</span>
+                    </div>
+                </div>
+                
+                <div class="user-card-actions">
+                    <div class="toggle-container">
+                        <span class="toggle-label">🎮 Conta Demo:</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" 
+                                   class="demo-toggle" 
+                                   data-user-id="{{ $user->id }}"
+                                   data-user-name="{{ $user->name }}"
+                                   {{ $user->demo ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    @if($user->demo)
+                    <div class="action-buttons">
+                        <button class="btn-action btn-balance" 
+                                data-user-id="{{ $user->id }}"
+                                data-user-name="{{ $user->name }}"
+                                data-current-balance="{{ $user->wallet->balance ?? 0 }}"
+                                title="Adicionar saldo demo">
+                            💰 Saldo
+                        </button>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @empty
+            <div class="no-data">
+                <div class="no-data-content">
+                    <span class="no-data-icon">🔍</span>
+                    <p>Nenhum usuário encontrado</p>
+                </div>
+            </div>
+            @endforelse
+        </div>
     </div>
 
     <!-- Paginação -->
@@ -460,14 +522,170 @@
     
     /* Responsive */
     @media (max-width: 768px) {
+        .admin-container {
+            padding: 10px;
+        }
+        
+        .admin-header-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .admin-title {
+            font-size: 1.5rem;
+        }
+        
+        .admin-subtitle {
+            font-size: 0.9rem;
+        }
+        
+        .admin-filters {
+            padding: 15px;
+        }
+        
         .filter-group {
             flex-direction: column;
             align-items: stretch;
+            gap: 10px;
         }
         
         .filter-input, .filter-select {
             min-width: auto;
             width: 100%;
+            font-size: 16px; /* Evita zoom no iOS */
+        }
+        
+        .filter-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px 20px;
+        }
+        
+        /* Layout de cards para mobile */
+        .admin-table-container {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .admin-table {
+            display: none; /* Esconder tabela no mobile */
+        }
+        
+        /* Cards para mobile */
+        .mobile-cards {
+            display: block;
+        }
+        
+        .user-card {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0, 255, 135, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .user-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .user-card-info h3 {
+            color: #00ff87;
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .user-card-info p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+        }
+        
+        .user-card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        .user-card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            justify-content: flex-end;
+        }
+        
+        .btn-action {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        /* Paginação mobile */
+        .admin-pagination {
+            margin-top: 15px;
+        }
+        
+        .admin-pagination .pagination {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .admin-pagination .page-link {
+            padding: 8px 12px;
+            margin: 2px;
+        }
+    }
+    
+    @media (min-width: 769px) {
+        .mobile-cards {
+            display: none;
+        }
+        
+        .admin-table {
+            display: table;
         }
         
         .admin-table-container {
@@ -476,6 +694,33 @@
         
         .admin-table {
             min-width: 800px;
+        }
+    }
+    
+    /* Melhorias gerais de responsividade */
+    @media (max-width: 480px) {
+        .user-card-details {
+            grid-template-columns: 1fr;
+        }
+        
+        .user-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .user-card-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .toggle-container {
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .action-buttons {
+            justify-content: center;
+            width: 100%;
         }
     }
 </style>
