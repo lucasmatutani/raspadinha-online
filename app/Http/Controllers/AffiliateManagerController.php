@@ -37,8 +37,14 @@ class AffiliateManagerController extends Controller
                     'affiliate_code' => $affiliate->affiliate_code,
                     'status' => $affiliate->status,
                     'total_referrals' => $affiliate->referrals_count,
-                    'total_earnings' => $affiliate->total_earnings,
-                    'pending_earnings' => $affiliate->pending_earnings,
+                    'total_earnings' => $affiliate->commissions()
+                        ->where('status', 'paid')
+                        ->where('commission_amount', '>', 0)
+                        ->sum('commission_amount'),
+                    'pending_earnings' => $affiliate->commissions()
+                        ->where('status', 'pending')
+                        ->where('commission_amount', '>', 0)
+                        ->sum('commission_amount'),
                     'commission_rate' => $affiliate->commission_rate,
                     'referrals' => $affiliate->referrals->map(function($referral) {
                         return [
