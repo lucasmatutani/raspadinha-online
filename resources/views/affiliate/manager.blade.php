@@ -324,6 +324,23 @@
         font-size: 1.1rem;
     }
 
+    .detail-value.pending,
+    .balance.pending {
+        color: #ffa500;
+        font-weight: 600;
+    }
+
+    .balance.pending {
+        position: relative;
+    }
+
+    .balance.pending::after {
+        content: ' (Pendente)';
+        font-size: 0.8rem;
+        color: rgba(255, 165, 0, 0.7);
+        font-weight: normal;
+    }
+
     .user-card-actions {
         margin-top: 1rem;
     }
@@ -611,7 +628,8 @@
                     <th>Afiliado</th>
                     <th>Código</th>
                     <th>Referidos</th>
-                    <th>Comissões</th>
+                    <th>Comissão Total</th>
+                    <th>Comissão Pendente</th>
                     <th>Taxa (%)</th>
                     <th>Status</th>
                     <th>Ações</th>
@@ -636,6 +654,9 @@
                     </td>
                     <td>
                         <span class="balance">R$ {{ number_format($affiliate['total_earnings'] ?? 0, 2, ',', '.') }}</span>
+                    </td>
+                    <td>
+                        <span class="balance pending">R$ {{ number_format($affiliate['pending_earnings'] ?? 0, 2, ',', '.') }}</span>
                     </td>
                     <td>
                         <form data-affiliate-id="{{ $affiliate['id'] }}" style="display: inline;">
@@ -699,8 +720,12 @@
                     <span class="detail-value">{{ $affiliate['total_referrals'] ?? 0 }}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Comissões</span>
+                    <span class="detail-label">Comissão Total</span>
                     <span class="detail-value">R$ {{ number_format($affiliate['total_earnings'] ?? 0, 2, ',', '.') }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Comissão Pendente</span>
+                    <span class="detail-value pending">R$ {{ number_format($affiliate['pending_earnings'] ?? 0, 2, ',', '.') }}</span>
                 </div>
             </div>
             
