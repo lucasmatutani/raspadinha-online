@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
+use App\Models\Commission;
 use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,6 +12,16 @@ use Illuminate\Support\Facades\DB;
 
 class AffiliateManagerController extends Controller
 {
+    /**
+     * Calcula o total de comissões pendentes de todos os afiliados
+     */
+    public static function getTotalPendingCommissions()
+    {
+        return Commission::where('status', 'pending')
+            ->where('commission_amount', '>', 0)
+            ->sum('commission_amount');
+    }
+
     /**
      * Exibe o painel de administração de afiliados
      */

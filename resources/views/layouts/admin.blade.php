@@ -323,6 +323,9 @@
         <!-- Navegação Desktop -->
         <nav class="admin-nav">
             <span style="color: #94a3b8;">{{ auth()->user()->name }}</span>
+            <div style="background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); padding: 0.5rem 1rem; border-radius: 8px; color: #ffa500; font-weight: 600; font-size: 0.9rem;">
+                💰 Comissões Pendentes: R$ {{ number_format(\App\Http\Controllers\AffiliateManagerController::getTotalPendingCommissions(), 2, ',', '.') }}
+            </div>
             <a href="{{ route('admin.demo-accounts') }}" class="admin-btn">👥 Contas Demo</a>
             <a href="{{ route('affiliate.manager') }}" class="admin-btn">🤝 Gerenciar Afiliados</a>
             <a href="{{ route('game.index') }}" class="admin-btn">🎮 Voltar ao Jogo</a>
@@ -358,6 +361,11 @@
         
         <div class="mobile-menu-user">
             👤 {{ auth()->user()->name }}
+        </div>
+        
+        <div style="background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); padding: 1rem; border-radius: 8px; color: #ffa500; font-weight: 600; text-align: center; margin-bottom: 1rem;">
+            💰 Comissões Pendentes<br>
+            <span style="font-size: 1.1rem;">R$ {{ number_format(\App\Http\Controllers\AffiliateManagerController::getTotalPendingCommissions(), 2, ',', '.') }}</span>
         </div>
         
         <a href="{{ route('admin.demo-accounts') }}" class="mobile-menu-item">
