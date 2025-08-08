@@ -222,22 +222,60 @@
         }
 
         .commission-form > div {
+            background: rgba(0, 255, 135, 0.05);
+            border: 1px solid rgba(0, 255, 135, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
 
+        .commission-form label {
+            font-weight: 600;
+            color: #00ff87;
+            margin-bottom: 0.5rem;
+        }
+
+        .commission-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .commission-input,
         .status-toggle {
-            width: 100%;
+            flex: 1;
             padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .commission-input {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .percent-symbol {
+            color: #00ff87;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .mobile-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
 
         .save-btn,
         .reset-btn {
-            width: 100%;
+            flex: 1;
             padding: 0.75rem;
             margin-left: 0 !important;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
         }
 
         .affiliate-stats {
@@ -321,10 +359,38 @@
         }
     }
 
-    /* Desktop - esconder cards mobile */
+    /* Desktop - esconder cards mobile e manter layout original */
     @media (min-width: 769px) {
         .referrals-mobile {
             display: none;
+        }
+
+        .commission-form {
+            flex-direction: row !important;
+            align-items: center !important;
+        }
+
+        .commission-form > div {
+            background: transparent;
+            border: none;
+            padding: 0;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .commission-input-wrapper {
+            display: inline-flex;
+        }
+
+        .mobile-buttons {
+            display: inline-flex;
+            margin-top: 0;
+        }
+
+        .save-btn,
+        .reset-btn {
+            width: auto;
+            margin-left: 0.75rem !important;
         }
     }
 
@@ -370,9 +436,11 @@
                         <form class="commission-form d-flex align-items-center gap-2" data-affiliate-id="{{ $affiliate['id'] }}">
                             <div>
                                 <label for="commission-{{ $affiliate['id'] }}" class="me-2">Comissão:</label>
-                                <input type="number" id="commission-{{ $affiliate['id'] }}" class="commission-input" 
-                                    value="{{ $affiliate['commission_rate'] }}" min="0" max="100" step="0.01">
-                                <span>%</span>
+                                <div class="commission-input-wrapper">
+                                    <input type="number" id="commission-{{ $affiliate['id'] }}" class="commission-input" 
+                                        value="{{ $affiliate['commission_rate'] }}" min="0" max="100" step="0.01">
+                                    <span class="percent-symbol">%</span>
+                                </div>
                             </div>
                             <div class="ms-3">
                                 <label for="status-{{ $affiliate['id'] }}" class="me-2">Status:</label>
@@ -381,8 +449,10 @@
                                     <option value="inactive" {{ $affiliate['status'] == 'inactive' ? 'selected' : '' }}>Inativo</option>
                                 </select>
                             </div>
-                            <button type="submit" class="save-btn ms-3">Salvar</button>
-                            <button type="button" class="reset-btn" onclick="resetCommissions({{ $affiliate['id'] }})">Zerar Comissões</button>
+                            <div class="mobile-buttons">
+                                <button type="submit" class="save-btn ms-3">Salvar</button>
+                                <button type="button" class="reset-btn" onclick="resetCommissions({{ $affiliate['id'] }})">Zerar Comissões</button>
+                            </div>
                         </form>
                     </div>
                 </div>
