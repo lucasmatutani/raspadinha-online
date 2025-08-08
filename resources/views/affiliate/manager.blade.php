@@ -221,6 +221,12 @@
             width: 100%;
         }
 
+        .mobile-inputs-row {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
         .commission-form > div {
             background: rgba(0, 255, 135, 0.05);
             border: 1px solid rgba(0, 255, 135, 0.1);
@@ -229,12 +235,14 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            flex: 1;
         }
 
         .commission-form label {
             font-weight: 600;
             color: #00ff87;
             margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .commission-input-wrapper {
@@ -245,7 +253,7 @@
 
         .commission-input,
         .status-toggle {
-            flex: 1;
+            width: 100%;
             padding: 0.75rem;
             border-radius: 6px;
             font-size: 1rem;
@@ -266,16 +274,17 @@
             display: flex;
             gap: 0.75rem;
             margin-top: 1rem;
+            justify-content: center;
         }
 
         .save-btn,
         .reset-btn {
-            flex: 1;
-            padding: 0.75rem;
+            padding: 0.75rem 1.5rem;
             margin-left: 0 !important;
             font-size: 0.95rem;
             font-weight: 600;
             border-radius: 8px;
+            min-width: 120px;
         }
 
         .affiliate-stats {
@@ -366,32 +375,39 @@
         }
 
         .commission-form {
-            flex-direction: row !important;
-            align-items: center !important;
-        }
+             flex-direction: row !important;
+             align-items: center !important;
+         }
 
-        .commission-form > div {
-            background: transparent;
-            border: none;
-            padding: 0;
-            flex-direction: row;
-            align-items: center;
-        }
+         .mobile-inputs-row {
+             display: contents;
+         }
 
-        .commission-input-wrapper {
-            display: inline-flex;
-        }
+         .commission-form > div > div {
+             background: transparent;
+             border: none;
+             padding: 0;
+             flex-direction: row;
+             align-items: center;
+             flex: none;
+         }
 
-        .mobile-buttons {
-            display: inline-flex;
-            margin-top: 0;
-        }
+         .commission-input-wrapper {
+             display: inline-flex;
+         }
 
-        .save-btn,
-        .reset-btn {
-            width: auto;
-            margin-left: 0.75rem !important;
-        }
+         .mobile-buttons {
+             display: inline-flex;
+             margin-top: 0;
+         }
+
+         .save-btn,
+         .reset-btn {
+             width: auto;
+             margin-left: 0.75rem !important;
+             padding: 0.5rem 1rem;
+             min-width: auto;
+         }
     }
 
     /* Tablet */
@@ -434,20 +450,22 @@
                     </div>
                     <div>
                         <form class="commission-form d-flex align-items-center gap-2" data-affiliate-id="{{ $affiliate['id'] }}">
-                            <div>
-                                <label for="commission-{{ $affiliate['id'] }}" class="me-2">Comissão:</label>
-                                <div class="commission-input-wrapper">
-                                    <input type="number" id="commission-{{ $affiliate['id'] }}" class="commission-input" 
-                                        value="{{ $affiliate['commission_rate'] }}" min="0" max="100" step="0.01">
-                                    <span class="percent-symbol">%</span>
+                            <div class="mobile-inputs-row">
+                                <div>
+                                    <label for="commission-{{ $affiliate['id'] }}" class="me-2">Comissão:</label>
+                                    <div class="commission-input-wrapper">
+                                        <input type="number" id="commission-{{ $affiliate['id'] }}" class="commission-input" 
+                                            value="{{ $affiliate['commission_rate'] }}" min="0" max="100" step="0.01">
+                                        <span class="percent-symbol">%</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="ms-3">
-                                <label for="status-{{ $affiliate['id'] }}" class="me-2">Status:</label>
-                                <select id="status-{{ $affiliate['id'] }}" class="status-toggle">
-                                    <option value="active" {{ $affiliate['status'] == 'active' ? 'selected' : '' }}>Ativo</option>
-                                    <option value="inactive" {{ $affiliate['status'] == 'inactive' ? 'selected' : '' }}>Inativo</option>
-                                </select>
+                                <div class="ms-3">
+                                    <label for="status-{{ $affiliate['id'] }}" class="me-2">Status:</label>
+                                    <select id="status-{{ $affiliate['id'] }}" class="status-toggle">
+                                        <option value="active" {{ $affiliate['status'] == 'active' ? 'selected' : '' }}>Ativo</option>
+                                        <option value="inactive" {{ $affiliate['status'] == 'inactive' ? 'selected' : '' }}>Inativo</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="mobile-buttons">
                                 <button type="submit" class="save-btn ms-3">Salvar</button>
