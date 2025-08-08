@@ -52,6 +52,7 @@ class AffiliateController extends Controller
             'pending_earnings' => $affiliate->pending_earnings,
             'this_month_earnings' => $affiliate->commissions()
                 ->where('created_at', '>=', now()->startOfMonth())
+                ->where('status', 'paid')
                 ->where('commission_amount', '>', 0)
                 ->sum('commission_amount'),
             'recent_referrals' => $affiliate->referrals()
@@ -64,7 +65,7 @@ class AffiliateController extends Controller
                         'name' => $referral->referredUser->name,
                         'joined_at' => $referral->registered_at->format('d/m/Y'),
                         'total_losses' => $referral->total_losses,
-                        'commission_generated' => $referral->commissions()->where('commission_amount', '>', 0)->sum('commission_amount')
+                        'commission_generated' => $referral->total_commission
                     ];
                 }),
             'commission_rate' => $affiliate->commission_rate
@@ -155,6 +156,9 @@ class AffiliateController extends Controller
         $affiliate = Affiliate::findOrFail($affiliateId);
         
         DB::transaction(function() use ($affiliate) {
+            // Salvar o valor pendente antes de zerá-lo
+            $pendingAmount = $affiliate->pending_earnings;
+            
             // Marca todas as comissões com valor maior que zero como pagas
             $affiliate->commissions()
                 ->where('status', 'pending')
@@ -162,12 +166,12 @@ class AffiliateController extends Controller
                 ->update(['status' => 'paid']);
 
             // Transfere de pendente para total
-            $affiliate->total_earnings += $affiliate->pending_earnings;
+            $affiliate->total_earnings += $pendingAmount;
             $affiliate->pending_earnings = 0;
             $affiliate->save();
 
-            // Aqui você adicionaria a lógica para creditar na carteira do afiliado
-            $affiliate->user->wallet->increment('balance', $affiliate->pending_earnings);
+            // Creditar na carteira do afiliado com o valor correto
+            $affiliate->user->wallet->increment('balance', $pendingAmount);
         });
 
         return response()->json([

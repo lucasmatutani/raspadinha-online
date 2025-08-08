@@ -48,14 +48,8 @@ class AffiliateManagerController extends Controller
                     'affiliate_code' => $affiliate->affiliate_code,
                     'status' => $affiliate->status,
                     'total_referrals' => $affiliate->referrals_count,
-                    'total_earnings' => $affiliate->commissions()
-                        ->where('status', 'paid')
-                        ->where('commission_amount', '>', 0)
-                        ->sum('commission_amount'),
-                    'pending_earnings' => $affiliate->commissions()
-                        ->where('status', 'pending')
-                        ->where('commission_amount', '>', 0)
-                        ->sum('commission_amount'),
+                    'total_earnings' => $affiliate->total_earnings,
+                    'pending_earnings' => $affiliate->pending_earnings,
                     'commission_rate' => $affiliate->commission_rate,
                     'referrals' => $affiliate->referrals->map(function($referral) {
                         return [
@@ -67,7 +61,7 @@ class AffiliateManagerController extends Controller
                                 'created_at' => $referral->referredUser->created_at->format('d/m/Y H:i'),
                             ],
                             'total_losses' => $referral->total_losses,
-                            'total_commission' => $referral->commissions()->where('commission_amount', '>', 0)->sum('commission_amount'),
+                            'total_commission' => $referral->total_commission,
                             'registered_at' => $referral->registered_at->format('d/m/Y'),
                         ];
                     }),

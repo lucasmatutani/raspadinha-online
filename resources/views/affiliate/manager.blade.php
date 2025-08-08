@@ -1047,8 +1047,7 @@
                 
                 affiliate.referrals.forEach(referral => {
                     const totalLosses = parseFloat(referral.total_losses || 0);
-                    const commissionRate = parseFloat(affiliate.commission_rate || 0) / 100;
-                    const totalCommission = totalLosses * commissionRate;
+                    const totalCommission = parseFloat(referral.total_commission || 0);
                     
                     content += `
                         <tr>
