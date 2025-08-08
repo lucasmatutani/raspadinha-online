@@ -12,9 +12,18 @@ class DemoAccountController extends Controller
     {
         $query = User::with('wallet');
         
-        // Filtro por email se fornecido
-        if ($request->filled('email')) {
-            $query->where('email', 'like', '%' . $request->email . '%');
+        // Filtro por busca (nome, email ou telefone)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+        
+        // Filtro por tipo de conta (demo ou real)
+        if ($request->filled('demo_filter')) {
+            $query->where('demo', $request->demo_filter);
         }
         
         // Paginação
