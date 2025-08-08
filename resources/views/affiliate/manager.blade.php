@@ -454,10 +454,18 @@
             width: 100%;
         }
 
+        /* Layout de cards para mobile */
         .admin-table-container {
-            display: none;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .admin-table {
+            display: none; /* Esconder tabela no mobile */
         }
 
+        /* Cards para mobile */
         .mobile-cards {
             display: block;
         }
@@ -478,6 +486,18 @@
     @media (min-width: 769px) {
         .mobile-cards {
             display: none;
+        }
+        
+        .admin-table {
+            display: table;
+        }
+        
+        .admin-table-container {
+            overflow-x: auto;
+        }
+        
+        .admin-table {
+            min-width: 1000px;
         }
     }
 
