@@ -126,13 +126,15 @@ class AffiliateManagerController extends Controller
             $affiliate = Affiliate::findOrFail($id);
             
             DB::transaction(function() use ($affiliate) {
+                // Marcar todas as comissões pendentes como pagas antes de zerar
+                $affiliate->commissions()
+                    ->where('status', 'pending')
+                    ->update(['status' => 'paid']);
+                
                 // Zerar ganhos totais e pendentes
                 $affiliate->total_earnings = 0;
                 $affiliate->pending_earnings = 0;
                 $affiliate->save();
-                
-                // Zerar todas as comissões relacionadas
-                $affiliate->commissions()->delete();
                 
                 // Zerar comissões dos referrals
                 $affiliate->referrals()->update([
