@@ -786,7 +786,7 @@
     </div>
 
     <!-- Cards para mobile -->
-    <div class="mobile-cards" style="display: none;">
+    <div class="mobile-cards">
         @forelse($affiliates as $affiliate)
         <div class="user-card">
             <div class="user-card-header">
