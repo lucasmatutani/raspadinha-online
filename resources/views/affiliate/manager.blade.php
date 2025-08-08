@@ -434,6 +434,116 @@
             padding: 0.75rem;
         }
     }
+
+    /* Modal Styles */
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        margin: 5% auto;
+        padding: 0;
+        border: 1px solid #00ff87;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 255, 135, 0.3);
+    }
+
+    .modal-header {
+        background: linear-gradient(90deg, #00ff87, #00d4aa);
+        color: #1a1a2e;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .close-modal {
+        color: #1a1a2e;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+        transform: scale(1.1);
+    }
+
+    .modal-body {
+        padding: 20px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .referrals-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .referrals-table th,
+    .referrals-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .referrals-table th {
+        background: rgba(0, 255, 135, 0.1);
+        color: #00ff87;
+        font-weight: 600;
+    }
+
+    .referrals-table tr:hover {
+        background: rgba(0, 255, 135, 0.05);
+    }
+
+    .no-referrals {
+        text-align: center;
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .no-referrals-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+
+        .referrals-table {
+            font-size: 0.9rem;
+        }
+
+        .referrals-table th,
+        .referrals-table td {
+            padding: 8px;
+        }
+    }
 </style>
 @endpush
 
@@ -619,6 +729,21 @@
         {{ $affiliates->links() }}
     </div>
     @endif
+
+    <!-- Modal de Referidos -->
+    <div id="referralsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Referidos do Afiliado</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="referralsContent">
+                    <!-- Conteúdo será carregado dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -652,8 +777,86 @@
         // Função para mostrar referidos
         document.querySelectorAll('.btn-referrals').forEach(button => {
             button.addEventListener('click', function() {
-                showNotification('Funcionalidade em desenvolvimento', 'info');
+                const affiliateId = this.getAttribute('data-affiliate-id');
+                showReferralsModal(affiliateId);
             });
+        });
+
+        // Função para mostrar modal de referidos
+        function showReferralsModal(affiliateId) {
+            // Buscar dados do afiliado
+            const affiliateData = @json($affiliates->items());
+            const affiliate = affiliateData.find(a => a.id == affiliateId);
+            
+            if (!affiliate) {
+                showNotification('Afiliado não encontrado', 'error');
+                return;
+            }
+
+            // Atualizar título do modal
+            document.getElementById('modalTitle').textContent = `Referidos de ${affiliate.user.name}`;
+            
+            // Gerar conteúdo do modal
+            let content = '';
+            
+            if (affiliate.referrals && affiliate.referrals.length > 0) {
+                content = `
+                    <div style="margin-bottom: 15px; color: #00ff87; font-weight: 600;">
+                        Total de referidos: ${affiliate.referrals.length}
+                    </div>
+                    <table class="referrals-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Data de Cadastro</th>
+                                <th>Perdas Totais</th>
+                                <th>Comissão Gerada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                affiliate.referrals.forEach(referral => {
+                    content += `
+                        <tr>
+                            <td>${referral.user.name}</td>
+                            <td>${referral.user.email}</td>
+                            <td>${referral.registered_at}</td>
+                            <td>R$ ${parseFloat(referral.total_losses || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                            <td style="color: #00ff87; font-weight: 600;">R$ ${parseFloat(referral.total_commission || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+                
+                content += `
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                content = `
+                    <div class="no-referrals">
+                        <div class="no-referrals-icon">👥</div>
+                        <div>Este afiliado ainda não possui referidos</div>
+                    </div>
+                `;
+            }
+            
+            // Inserir conteúdo e mostrar modal
+            document.getElementById('referralsContent').innerHTML = content;
+            document.getElementById('referralsModal').style.display = 'block';
+        }
+
+        // Fechar modal
+        document.querySelector('.close-modal').addEventListener('click', function() {
+            document.getElementById('referralsModal').style.display = 'none';
+        });
+
+        // Fechar modal clicando fora
+        document.getElementById('referralsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
         });
         
         // Função para mostrar notificações
