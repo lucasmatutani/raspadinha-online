@@ -847,13 +847,17 @@
                 `;
                 
                 affiliate.referrals.forEach(referral => {
+                    const totalLosses = parseFloat(referral.total_losses || 0);
+                    const commissionRate = parseFloat(affiliate.commission_rate || 0) / 100;
+                    const totalCommission = totalLosses * commissionRate;
+                    
                     content += `
                         <tr>
                             <td>${referral.user.name}</td>
                             <td>${referral.user.email}</td>
-                            <td>${referral.registered_at}</td>
-                            <td>R$ ${parseFloat(referral.total_losses || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                            <td style="color: #00ff87; font-weight: 600;">R$ ${parseFloat(referral.total_commission || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                            <td>${new Date(referral.user.created_at).toLocaleDateString('pt-BR')}</td>
+                            <td>R$ ${totalLosses.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                            <td style="color: #00ff87; font-weight: 600;">R$ ${totalCommission.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
                         </tr>
                     `;
                 });
@@ -863,40 +867,10 @@
                     </table>
                 `;
             } else {
-                // Dados de teste para demonstrar o scroll
                 content = `
-                    <table class="referrals-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>E-mail</th>
-                                <th>Data de Cadastro</th>
-                                <th>Perdas Totais</th>
-                                <th>Comissão Gerada</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                // Adicionar dados de teste para demonstrar o scroll
-                for(let i = 1; i <= 15; i++) {
-                    content += `
-                        <tr>
-                            <td>Usuário Teste ${i}</td>
-                            <td>usuario${i}@teste.com</td>
-                            <td>${new Date().toLocaleDateString('pt-BR')}</td>
-                            <td>R$ ${(Math.random() * 1000).toFixed(2).replace('.', ',')}</td>
-                            <td style="color: #00ff87; font-weight: 600;">R$ ${(Math.random() * 100).toFixed(2).replace('.', ',')}</td>
-                        </tr>
-                    `;
-                }
-                
-                content += `
-                        </tbody>
-                    </table>
-                    <div class="no-referrals" style="margin-top: 20px; padding: 20px; text-align: center; color: #888;">
+                    <div class="no-referrals">
                         <div class="no-referrals-icon">👥</div>
-                        <div>Dados de teste para demonstrar o scroll</div>
+                        <div>Este afiliado ainda não possui referidos</div>
                     </div>
                 `;
             }
