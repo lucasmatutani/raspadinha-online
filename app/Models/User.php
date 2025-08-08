@@ -19,7 +19,8 @@ class User extends Authenticatable
         'password',
         'pix_key',
         'key_type',
-        'referred_by_code'
+        'referred_by_code',
+        'demo'
     ];
 
     protected $hidden = [
@@ -30,6 +31,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'demo' => 'boolean',
     ];
 
     // Relacionamentos

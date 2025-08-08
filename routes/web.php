@@ -74,10 +74,20 @@ Route::middleware('auth')->group(function () {
         ->name('affiliate.dashboard');
 });
 
-// Para admin - pagar comissões
+// Para admin - pagar comissões e gerenciar contas demo
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/affiliate/pay-commissions', [AffiliateController::class, 'payCommissions'])
         ->name('admin.affiliate.pay');
+    
+    // Rotas para gerenciamento de contas demo
+    Route::get('/admin/demo-accounts', [App\Http\Controllers\DemoAccountController::class, 'index'])
+        ->name('admin.demo-accounts');
+    Route::post('/admin/demo-accounts/{user}/toggle', [App\Http\Controllers\DemoAccountController::class, 'toggleDemo'])
+        ->name('admin.demo-accounts.toggle');
+    Route::get('/admin/demo-accounts/search', [App\Http\Controllers\DemoAccountController::class, 'search'])
+        ->name('admin.demo-accounts.search');
+    Route::post('/admin/demo-accounts/{user}/add-balance', [App\Http\Controllers\DemoAccountController::class, 'addBalance'])
+        ->name('admin.demo-accounts.add-balance');
 });
 
 

@@ -78,8 +78,9 @@ class PixController extends Controller
 
     private function getVipUserIds()
     {
-        $vips = config('services.scratch_card.vip_user_ids');
-        return $vips;
+        // Buscar usuários demo do banco de dados
+        $demoUsers = \App\Models\User::where('demo', true)->pluck('id')->toArray();
+        return $demoUsers;
     }
 
     public function withdrawal(Request $request)
