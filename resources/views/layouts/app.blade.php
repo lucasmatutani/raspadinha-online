@@ -993,7 +993,7 @@
                         onblur="this.style.borderColor='#666'"
                         oninput="formatPixKey(this)">
                     <div id="pixKeyHelper" style="margin-top: 0.5rem; font-size: 0.9rem; color: #999;">
-                        NÃO UTILIZE PONTOS OU - (SOMENTE EM CASO DE EMAIL)
+                        NÃO UTILIZE PONTOS OU TRAÇOS (SOMENTE EM CASO DE EMAIL)
                     </div>
                 </div>
 
