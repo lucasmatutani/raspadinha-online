@@ -105,12 +105,6 @@ class RegisteredUserController extends Controller
                 'total_commission' => 0
             ]);
 
-            \Log::info('Referral criado automaticamente', [
-                'referral_id' => $referral->id,
-                'affiliate_code' => $affiliateCode,
-                'user_email' => $user->email
-            ]);
-
         } catch (\Exception $e) {
             \Log::error('Erro ao criar referral automático', [
                 'error' => $e->getMessage(),
