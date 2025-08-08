@@ -484,45 +484,45 @@
                     <td>
                         <div class="user-info">
                             <div>
-                                <div style="font-weight: 600; color: #00ff87;">{{ $affiliate->user->name }}</div>
-                                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">{{ $affiliate->user->email }}</div>
+                                <div style="font-weight: 600; color: #00ff87;">{{ $affiliate['user']['name'] }}</div>
+                                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">{{ $affiliate['user']['email'] }}</div>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <span class="affiliate-code">{{ $affiliate->affiliate_code }}</span>
+                        <span class="affiliate-code">{{ $affiliate['affiliate_code'] }}</span>
                     </td>
                     <td>
-                        <span class="referrals-count">{{ $affiliate->referrals_count ?? 0 }}</span>
+                        <span class="referrals-count">{{ $affiliate['total_referrals'] ?? 0 }}</span>
                     </td>
                     <td>
-                        <span class="balance">R$ {{ number_format($affiliate->total_commission ?? 0, 2, ',', '.') }}</span>
+                        <span class="balance">R$ {{ number_format($affiliate['total_earnings'] ?? 0, 2, ',', '.') }}</span>
                     </td>
                     <td>
-                        <form data-affiliate-id="{{ $affiliate->id }}" style="display: inline;">
+                        <form data-affiliate-id="{{ $affiliate['id'] }}" style="display: inline;">
                             <input type="number" 
                                    class="commission-input" 
-                                   value="{{ $affiliate->commission_rate }}" 
+                                   value="{{ $affiliate['commission_rate'] }}" 
                                    min="0" 
                                    max="100" 
                                    step="0.01">
                         </form>
                     </td>
                     <td>
-                        <select class="status-toggle" data-affiliate-id="{{ $affiliate->id }}">
-                            <option value="active" {{ $affiliate->status === 'active' ? 'selected' : '' }}>Ativo</option>
-                            <option value="inactive" {{ $affiliate->status === 'inactive' ? 'selected' : '' }}>Inativo</option>
+                        <select class="status-toggle" data-affiliate-id="{{ $affiliate['id'] }}">
+                            <option value="active" {{ $affiliate['status'] === 'active' ? 'selected' : '' }}>Ativo</option>
+                            <option value="inactive" {{ $affiliate['status'] === 'inactive' ? 'selected' : '' }}>Inativo</option>
                         </select>
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-action btn-save" data-affiliate-id="{{ $affiliate->id }}">
+                            <button class="btn-action btn-save" data-affiliate-id="{{ $affiliate['id'] }}">
                                 <i class="fas fa-save"></i> Salvar
                             </button>
-                            <button class="btn-action btn-referrals" data-affiliate-id="{{ $affiliate->id }}">
+                            <button class="btn-action btn-referrals" data-affiliate-id="{{ $affiliate['id'] }}">
                                 <i class="fas fa-users"></i> Referidos
                             </button>
-                            <button class="btn-action btn-reset" data-affiliate-id="{{ $affiliate->id }}">
+                            <button class="btn-action btn-reset" data-affiliate-id="{{ $affiliate['id'] }}">
                                 <i class="fas fa-trash"></i> Zerar
                             </button>
                         </div>
@@ -548,32 +548,32 @@
         <div class="user-card">
             <div class="user-card-header">
                 <div class="user-card-info">
-                    <h3>{{ $affiliate->user->name }}</h3>
-                    <p>{{ $affiliate->user->email }}</p>
+                    <h3>{{ $affiliate['user']['name'] }}</h3>
+                    <p>{{ $affiliate['user']['email'] }}</p>
                 </div>
-                <span class="affiliate-code">{{ $affiliate->affiliate_code }}</span>
+                <span class="affiliate-code">{{ $affiliate['affiliate_code'] }}</span>
             </div>
             
             <div class="user-card-details">
                 <div class="detail-item">
                     <span class="detail-label">Referidos</span>
-                    <span class="detail-value">{{ $affiliate->referrals_count ?? 0 }}</span>
+                    <span class="detail-value">{{ $affiliate['total_referrals'] ?? 0 }}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Comissões</span>
-                    <span class="detail-value">R$ {{ number_format($affiliate->total_commission ?? 0, 2, ',', '.') }}</span>
+                    <span class="detail-value">R$ {{ number_format($affiliate['total_earnings'] ?? 0, 2, ',', '.') }}</span>
                 </div>
             </div>
             
             <div class="user-card-actions">
-                <div class="commission-mobile-form" data-affiliate-id="{{ $affiliate->id }}">
+                <div class="commission-mobile-form" data-affiliate-id="{{ $affiliate['id'] }}">
                     <div class="mobile-inputs-row">
                         <div class="input-group">
                             <label>Taxa de Comissão</label>
                             <div class="commission-input-wrapper">
                                 <input type="number" 
                                        class="commission-input" 
-                                       value="{{ $affiliate->commission_rate }}" 
+                                       value="{{ $affiliate['commission_rate'] }}" 
                                        min="0" 
                                        max="100" 
                                        step="0.01">
