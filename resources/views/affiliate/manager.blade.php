@@ -1,5 +1,5 @@
 <!-- resources/views/affiliate/manager.blade.php -->
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Gerenciador de Afiliados - RaspaKing')
 
@@ -193,13 +193,150 @@
         display: block;
     }
 
+    /* Responsividade Mobile */
     @media (max-width: 768px) {
+        .affiliate-manager {
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .affiliate-manager h1 {
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .affiliate-card {
+            padding: 1rem;
+        }
+
+        .affiliate-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .commission-form {
+            flex-direction: column !important;
+            gap: 1rem !important;
+            width: 100%;
+        }
+
+        .commission-form > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .commission-input,
+        .status-toggle {
+            width: 100%;
+            padding: 0.75rem;
+        }
+
+        .save-btn,
+        .reset-btn {
+            width: 100%;
+            padding: 0.75rem;
+            margin-left: 0 !important;
+        }
+
         .affiliate-stats {
             flex-direction: column;
         }
 
         .stat-box {
             min-width: 100%;
+        }
+
+        .toggle-referrals {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* Esconder tabela em mobile */
+        .referrals-table {
+            display: none;
+        }
+
+        /* Cards mobile para referrals */
+        .referrals-mobile {
+            display: block;
+        }
+
+        .referral-card {
+            background: rgba(0, 255, 135, 0.05);
+            border: 1px solid rgba(0, 255, 135, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .referral-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .referral-name {
+            font-weight: bold;
+            color: #00ff87;
+            font-size: 1.1rem;
+        }
+
+        .referral-email {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .referral-date {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .referral-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .referral-stat {
+            text-align: center;
+        }
+
+        .referral-stat-value {
+            font-weight: bold;
+            color: #00ff87;
+            font-size: 1rem;
+        }
+
+        .referral-stat-label {
+            color: #cccccc;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+    }
+
+    /* Desktop - esconder cards mobile */
+    @media (min-width: 769px) {
+        .referrals-mobile {
+            display: none;
+        }
+    }
+
+    /* Tablet */
+    @media (max-width: 1024px) and (min-width: 769px) {
+        .affiliate-manager {
+            padding: 1.5rem;
+        }
+
+        .commission-form {
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .referrals-table {
@@ -270,6 +407,7 @@
                 </button>
 
                 <div class="referrals-container" id="referrals-{{ $affiliate['id'] }}">
+                    <!-- Tabela Desktop -->
                     <table class="referrals-table">
                         <thead>
                             <tr>
@@ -292,6 +430,31 @@
                             @endforeach
                         </tbody>
                     </table>
+
+                    <!-- Cards Mobile -->
+                    <div class="referrals-mobile">
+                        @foreach($affiliate['referrals'] as $referral)
+                        <div class="referral-card">
+                            <div class="referral-card-header">
+                                <div>
+                                    <div class="referral-name">{{ $referral['user']['name'] }}</div>
+                                    <div class="referral-email">{{ $referral['user']['email'] }}</div>
+                                </div>
+                                <div class="referral-date">{{ $referral['registered_at'] }}</div>
+                            </div>
+                            <div class="referral-stats">
+                                <div class="referral-stat">
+                                    <div class="referral-stat-value">R$ {{ number_format($referral['total_losses'], 2, ',', '.') }}</div>
+                                    <div class="referral-stat-label">Perdas Totais</div>
+                                </div>
+                                <div class="referral-stat">
+                                    <div class="referral-stat-value">R$ {{ number_format($referral['total_commission'], 2, ',', '.') }}</div>
+                                    <div class="referral-stat-label">Comissão Gerada</div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
             @endforeach
