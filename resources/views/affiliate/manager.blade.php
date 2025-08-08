@@ -582,21 +582,21 @@
                         </div>
                         <div class="input-group">
                             <label>Status</label>
-                            <select class="status-toggle" data-affiliate-id="{{ $affiliate->id }}">
-                                <option value="active" {{ $affiliate->status === 'active' ? 'selected' : '' }}>Ativo</option>
-                                <option value="inactive" {{ $affiliate->status === 'inactive' ? 'selected' : '' }}>Inativo</option>
+                            <select class="status-toggle" data-affiliate-id="{{ $affiliate['id'] }}">
+                                <option value="active" {{ $affiliate['status'] === 'active' ? 'selected' : '' }}>Ativo</option>
+                                <option value="inactive" {{ $affiliate['status'] === 'inactive' ? 'selected' : '' }}>Inativo</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="mobile-buttons">
-                        <button class="btn-action btn-save" data-affiliate-id="{{ $affiliate->id }}">
+                        <button class="btn-action btn-save" data-affiliate-id="{{ $affiliate['id'] }}">
                             <i class="fas fa-save"></i> Salvar
                         </button>
-                        <button class="btn-action btn-referrals" data-affiliate-id="{{ $affiliate->id }}">
+                        <button class="btn-action btn-referrals" data-affiliate-id="{{ $affiliate['id'] }}">
                             <i class="fas fa-users"></i> Referidos
                         </button>
-                        <button class="btn-action btn-reset" data-affiliate-id="{{ $affiliate->id }}">
+                        <button class="btn-action btn-reset" data-affiliate-id="{{ $affiliate['id'] }}">
                             <i class="fas fa-trash"></i> Zerar
                         </button>
                     </div>
