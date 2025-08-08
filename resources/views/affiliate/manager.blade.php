@@ -489,7 +489,8 @@
 
     .modal-body {
         padding: 20px;
-        max-height: 60vh;
+        max-height: 400px;
+        min-height: 200px;
         overflow-y: auto;
         overflow-x: hidden;
     }
@@ -862,10 +863,40 @@
                     </table>
                 `;
             } else {
+                // Dados de teste para demonstrar o scroll
                 content = `
-                    <div class="no-referrals">
+                    <table class="referrals-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Data de Cadastro</th>
+                                <th>Perdas Totais</th>
+                                <th>Comissão Gerada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                // Adicionar dados de teste para demonstrar o scroll
+                for(let i = 1; i <= 15; i++) {
+                    content += `
+                        <tr>
+                            <td>Usuário Teste ${i}</td>
+                            <td>usuario${i}@teste.com</td>
+                            <td>${new Date().toLocaleDateString('pt-BR')}</td>
+                            <td>R$ ${(Math.random() * 1000).toFixed(2).replace('.', ',')}</td>
+                            <td style="color: #00ff87; font-weight: 600;">R$ ${(Math.random() * 100).toFixed(2).replace('.', ',')}</td>
+                        </tr>
+                    `;
+                }
+                
+                content += `
+                        </tbody>
+                    </table>
+                    <div class="no-referrals" style="margin-top: 20px; padding: 20px; text-align: center; color: #888;">
                         <div class="no-referrals-icon">👥</div>
-                        <div>Este afiliado ainda não possui referidos</div>
+                        <div>Dados de teste para demonstrar o scroll</div>
                     </div>
                 `;
             }
