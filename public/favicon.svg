@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="crownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Crown base -->
+  <rect x="15" y="65" width="70" height="15" fill="url(#crownGradient)" rx="2"/>
+  
+  <!-- Crown points -->
+  <polygon points="15,65 25,35 35,50 45,25 55,50 65,25 75,50 85,35 85,65" fill="url(#crownGradient)"/>
+  
+  <!-- Gems -->
+  <circle cx="30" cy="45" r="3" fill="#FF0000"/>
+  <circle cx="50" cy="35" r="4" fill="#0000FF"/>
+  <circle cx="70" cy="45" r="3" fill="#00FF00"/>
+  
+  <!-- Crown highlights -->
+  <polygon points="15,65 25,35 30,40 20,65" fill="rgba(255,255,255,0.3)"/>
+  <polygon points="40,30 45,25 50,30 45,35" fill="rgba(255,255,255,0.4)"/>
+</svg>
