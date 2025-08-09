@@ -67,7 +67,7 @@ class ScratchCardService
         $userId = auth()->id();
 
         if ($userId && in_array($userId, $this->getVipUserIds())) {
-            return rand(1, 100) <= 80;
+            return rand(1, 100) <= 85;
         }
         return rand(1, 100) <= 20;
     }
@@ -260,22 +260,22 @@ class ScratchCardService
 
         if ($userId && in_array($userId, $this->getVipUserIds())) {
             $weights = [
-                500 => 40,
-                1000 => 40,
-                2000 => 40,
-                5000 => 30,
-                10000 => 50,
+                500 => 10,
+                1000 => 10,
+                2000 => 20,
+                5000 => 20,
+                10000 => 40,
                 20000 => 30,
-                50000 => 20,
-                100000 => 10,
-                200000 => 1
+                50000 => 30,
+                100000 => 50,
+                200000 => 0
             ];
         } else {
             $weights = [
-                50 => 40,   // 50 centavos
+                50 => 36,   // 50 centavos
                 100 => 35,  // 1 real 
-                200 => 8,  // 2 reais
-                500 => 8,   // 5 reais
+                200 => 10,  // 2 reais
+                500 => 10,   // 5 reais
                 1000 => 5,  // 10 reais
                 2000 => 3,  // 20 reais
                 5000 => 1,  // 50 reais

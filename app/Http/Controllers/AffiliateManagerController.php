@@ -17,9 +17,8 @@ class AffiliateManagerController extends Controller
      */
     public static function getTotalPendingCommissions()
     {
-        return Commission::where('status', 'pending')
-            ->where('commission_amount', '>', 0)
-            ->sum('commission_amount');
+        return Affiliate::where('pending_earnings', '>', 0)
+            ->sum('pending_earnings');
     }
 
     /**

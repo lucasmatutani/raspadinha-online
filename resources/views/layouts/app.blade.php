@@ -924,7 +924,7 @@
                 </div>
                 
                 <div style="color: #e0e0e0; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem;">
-                    Para liberar o saque, você precisa <strong style="color: #ffa500;">apostar pelo menos o valor total que depositou</strong>. Isso garante a segurança e integridade da plataforma.
+                    Para liberar o saque, você precisa <strong style="color: #ffa500;">apostar pelo menos o valor total que depositou</strong>. Isso garante a segurança e integridade da plataforma. ATUALIZE A PAGINA APÓS JOGAR PARA ATUALIZAR O ROLLOVER!!!
                 </div>
                 
                 <div style="background: rgba(255,165,0,0.1); border-radius: 10px; padding: 1rem; border-left: 4px solid #ffa500;">
