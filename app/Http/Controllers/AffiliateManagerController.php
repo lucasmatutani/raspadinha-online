@@ -25,7 +25,7 @@ class AffiliateManagerController extends Controller
     /**
      * Exibe o painel de administração de afiliados
      */
-    public function index()
+    public function index(Request $request)
     {
         // Verificar se o usuário está autenticado
         if (!Auth::check()) {
@@ -33,10 +33,24 @@ class AffiliateManagerController extends Controller
         }
         
         // Buscar afiliados que possuem mais de 1 afiliado
-        $affiliates = Affiliate::withCount('referrals')
+        $query = Affiliate::withCount('referrals')
             ->having('referrals_count', '>=', 1)
-            ->with(['user:id,name,email', 'referrals.referredUser:id,name,email,created_at'])
-            ->paginate(10)
+            ->with(['user:id,name,email', 'referrals.referredUser:id,name,email,created_at']);
+        
+        // Aplicar filtros de busca
+        if ($request->filled('search_name')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search_name . '%');
+            });
+        }
+        
+        if ($request->filled('search_email')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('email', 'like', '%' . $request->search_email . '%');
+            });
+        }
+        
+        $affiliates = $query->paginate(10)->appends($request->query())
             ->through(function($affiliate) {
                 return [
                     'id' => $affiliate->id,
