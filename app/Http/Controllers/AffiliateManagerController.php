@@ -49,7 +49,7 @@ class AffiliateManagerController extends Controller
             });
         }
         
-        $affiliates = $query->paginate(10)->appends($request->query())
+        $affiliates = $query->orderBy('pending_earnings', 'desc')->paginate(10)->appends($request->query())
             ->through(function($affiliate) {
                 return [
                     'id' => $affiliate->id,
