@@ -131,6 +131,26 @@ class AffiliateController extends Controller
 
                 // Atualizar totais do afiliado
                 $affiliate->increment('pending_earnings', $commissionAmount);
+                
+                // 🎯 NOVO: Se este afiliado tem um pai (é subafiliado), calcular comissão para o pai
+                if ($affiliate->parent_affiliate_id) {
+                    $parentAffiliate = Affiliate::find($affiliate->parent_affiliate_id);
+                    if ($parentAffiliate && $parentAffiliate->status === 'active') {
+                        // Calcular comissão do pai baseada na taxa de subafiliado
+                        $parentCommissionAmount = ($commissionAmount * $parentAffiliate->sub_affiliate_commission_rate) / 100;
+                        
+                        // Incrementar ganhos pendentes do pai
+                        $parentAffiliate->increment('pending_sub_affiliate_earnings', $parentCommissionAmount);
+                        
+                        \Log::info('Comissão de subafiliado processada', [
+                            'sub_affiliate_id' => $affiliate->id,
+                            'parent_affiliate_id' => $parentAffiliate->id,
+                            'sub_commission' => $commissionAmount,
+                            'parent_commission' => $parentCommissionAmount,
+                            'parent_rate' => $parentAffiliate->sub_affiliate_commission_rate
+                        ]);
+                    }
+                }
             });
 
             return true;
@@ -156,8 +176,10 @@ class AffiliateController extends Controller
         $affiliate = Affiliate::findOrFail($affiliateId);
         
         DB::transaction(function() use ($affiliate) {
-            // Salvar o valor pendente antes de zerá-lo
+            // Salvar os valores pendentes antes de zerá-los
             $pendingAmount = $affiliate->pending_earnings;
+            $pendingSubAffiliateAmount = $affiliate->pending_sub_affiliate_earnings;
+            $totalPayout = $pendingAmount + $pendingSubAffiliateAmount;
             
             // Marca todas as comissões com valor maior que zero como pagas
             $affiliate->commissions()
@@ -168,11 +190,25 @@ class AffiliateController extends Controller
             // Transfere de pendente para total
             $affiliate->total_earnings += $pendingAmount;
             $affiliate->pending_earnings = 0;
+            
+            // Transfere ganhos de subafiliados de pendente para total
+            $affiliate->total_sub_affiliate_earnings += $pendingSubAffiliateAmount;
+            $affiliate->pending_sub_affiliate_earnings = 0;
+            
             $affiliate->save();
 
-            // Creditar na carteira do afiliado com o valor correto
-            $affiliate->user->wallet->increment('balance', $pendingAmount);
-        });
+            // Creditar na carteira do afiliado com o valor total (comissões próprias + subafiliados)
+            if ($totalPayout > 0) {
+                $affiliate->user->wallet->increment('balance', $totalPayout);
+                
+                \Log::info('Comissões pagas', [
+                     'affiliate_id' => $affiliate->id,
+                     'own_commission' => $pendingAmount,
+                     'sub_affiliate_commission' => $pendingSubAffiliateAmount,
+                     'total_payout' => $totalPayout
+                 ]);
+             }
+         });
 
         return response()->json([
             'success' => true,

@@ -48,8 +48,15 @@ class UserSubAffiliateController extends Controller
             // Taxa que o afiliado pai tem sobre este subafiliado
             $subAffiliate->parent_commission_rate = $affiliate->sub_affiliate_commission_rate;
             
-            // Calcular o ganho do afiliado pai baseado nos ganhos pendentes do subafiliado
-            $subAffiliate->parent_earning = ($subAffiliate->pending_earnings * $affiliate->sub_affiliate_commission_rate) / 100;
+            // Usar o valor da coluna pending_sub_affiliate_earnings do pai em vez de calcular dinamicamente
+            // Calcular a proporção deste subafiliado no total de ganhos pendentes
+            $totalSubAffiliatePendingEarnings = Affiliate::where('parent_affiliate_id', $affiliate->id)->sum('pending_earnings');
+            if ($totalSubAffiliatePendingEarnings > 0) {
+                $proportion = $subAffiliate->pending_earnings / $totalSubAffiliatePendingEarnings;
+                $subAffiliate->parent_earning = $affiliate->pending_sub_affiliate_earnings * $proportion;
+            } else {
+                $subAffiliate->parent_earning = 0;
+            }
             
             return $subAffiliate;
         });
@@ -63,10 +70,8 @@ class UserSubAffiliateController extends Controller
         // Calcular ganhos pendentes totais (soma dos ganhos pendentes de todos os subafiliados)
         $pendingEarnings = $allSubAffiliates->sum('pending_earnings');
         
-        // Calcular o total do "seu ganho" (soma de todos os ganhos do afiliado pai)
-        $totalEarnings = $allSubAffiliates->sum(function($subAffiliate) use ($affiliate) {
-            return ($subAffiliate->pending_earnings * $affiliate->sub_affiliate_commission_rate) / 100;
-        });
+        // Usar o valor da coluna pending_sub_affiliate_earnings em vez de calcular dinamicamente
+        $totalEarnings = $affiliate->pending_sub_affiliate_earnings;
         
         $totalReferrals = Affiliate::where('parent_affiliate_id', $affiliate->id)
             ->withCount('referrals')

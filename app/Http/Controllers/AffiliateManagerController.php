@@ -144,9 +144,11 @@ class AffiliateManagerController extends Controller
                     ->where('status', 'pending')
                     ->update(['status' => 'paid']);
                 
-                // Zerar ganhos totais e pendentes
+                // Zerar ganhos totais e pendentes (próprios e de subafiliados)
                 $affiliate->total_earnings = 0;
                 $affiliate->pending_earnings = 0;
+                $affiliate->total_sub_affiliate_earnings = 0;
+                $affiliate->pending_sub_affiliate_earnings = 0;
                 $affiliate->save();
                 
                 // Zerar comissões dos referrals
@@ -162,6 +164,8 @@ class AffiliateManagerController extends Controller
                     'id' => $affiliate->id,
                     'total_earnings' => 0,
                     'pending_earnings' => 0,
+                    'total_sub_affiliate_earnings' => 0,
+                    'pending_sub_affiliate_earnings' => 0,
                 ],
             ]);
         } catch (\Exception $e) {
