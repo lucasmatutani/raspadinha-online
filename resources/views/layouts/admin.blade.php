@@ -329,6 +329,7 @@
             </div>
             <a href="{{ route('admin.demo-accounts') }}" class="admin-btn">👥 Contas Demo</a>
             <a href="{{ route('affiliate.manager') }}" class="admin-btn">🤝 Gerenciar Afiliados</a>
+            <a href="{{ route('sub-affiliates.index') }}" class="admin-btn">👑 Subafiliados</a>
             <a href="{{ route('game.index') }}" class="admin-btn">🎮 Voltar ao Jogo</a>
             
             <!-- Logout -->
@@ -375,6 +376,10 @@
         
         <a href="{{ route('affiliate.manager') }}" class="mobile-menu-item">
             🤝 Gerenciar Afiliados
+        </a>
+        
+        <a href="{{ route('sub-affiliates.index') }}" class="mobile-menu-item">
+            👑 Subafiliados
         </a>
         
         <a href="{{ route('game.index') }}" class="mobile-menu-item">

@@ -6,6 +6,8 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\PixController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\AffiliateManagerController;
+use App\Http\Controllers\SubAffiliateController;
+use App\Http\Controllers\UserSubAffiliateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +69,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/affiliate_manager/{id}/reset-commissions', [AffiliateManagerController::class, 'resetCommissions'])->name('affiliate.reset.commissions');
 });
 
+// Rotas para o painel de subafiliados
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/sub-affiliates', [SubAffiliateController::class, 'index'])->name('sub-affiliates.index');
+    Route::post('/sub-affiliates/{id}/commission-rate', [SubAffiliateController::class, 'updateSubAffiliateCommissionRate'])->name('sub-affiliates.update.commission');
+    Route::post('/sub-affiliates/{id}/reset-earnings', [SubAffiliateController::class, 'resetSubAffiliateEarnings'])->name('sub-affiliates.reset.earnings');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -80,6 +89,14 @@ Route::get('/ref/{affiliateCode}', [AffiliateController::class, 'track'])
 Route::middleware('auth')->group(function () {
     Route::get('/affiliate/dashboard', [AffiliateController::class, 'dashboard'])
         ->name('affiliate.dashboard');
+    
+    // Rotas para o painel de subafiliados do usuário
+    Route::get('/user/sub-affiliates', [UserSubAffiliateController::class, 'index'])
+        ->name('user.sub-affiliates.index');
+    Route::get('/user/sub-affiliates/{id}', [UserSubAffiliateController::class, 'show'])
+        ->name('user.sub-affiliates.show');
+    Route::get('/user/sub-affiliates/{id}/referrals', [UserSubAffiliateController::class, 'getReferrals'])
+        ->name('user.sub-affiliates.referrals');
 });
 
 // Para admin - pagar comissões e gerenciar contas demo

@@ -825,12 +825,15 @@
                     <div class="referral-link" id="affiliateLink">
                         Carregando...
                     </div>
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                         <button onclick="copyAffiliateLink()" class="btn btn-affiliate" style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">
                             📋 Copiar Link
                         </button>
                         <button onclick="shareAffiliateLink()" class="btn" style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">
                             📤 Compartilhar
+                        </button>
+                        <button onclick="openSubAffiliatesPanel()" class="btn" style="padding: 0.8rem 1.5rem; font-size: 0.9rem; background: linear-gradient(45deg, #667eea, #764ba2); color: #ffffff;">
+                            👑 Meus Subafiliados
                         </button>
                     </div>
                 </div>
@@ -2279,6 +2282,17 @@
             }
         `;
         document.head.appendChild(fireworkStyle);
+        
+        // Função para abrir o painel de subafiliados
+        window.openSubAffiliatesPanel = function() {
+            console.log('👑 Abrindo painel de subafiliados...');
+            
+            // Fechar o modal de afiliado
+            closeAffiliateModal();
+            
+            // Redirecionar para o painel de subafiliados
+            window.location.href = '/user/sub-affiliates';
+        };
     </script>
 
     @stack('scripts')

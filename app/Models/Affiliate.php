@@ -13,17 +13,24 @@ class Affiliate extends Model
 
     protected $fillable = [
         'user_id',
+        'parent_affiliate_id',
         'affiliate_code',
         'commission_rate',
+        'sub_affiliate_commission_rate',
         'status',
         'total_earnings',
-        'pending_earnings'
+        'pending_earnings',
+        'total_sub_affiliate_earnings',
+        'pending_sub_affiliate_earnings'
     ];
 
     protected $casts = [
         'commission_rate' => 'decimal:2',
+        'sub_affiliate_commission_rate' => 'decimal:2',
         'total_earnings' => 'decimal:2',
-        'pending_earnings' => 'decimal:2'
+        'pending_earnings' => 'decimal:2',
+        'total_sub_affiliate_earnings' => 'decimal:2',
+        'pending_sub_affiliate_earnings' => 'decimal:2'
     ];
 
     public function user()
@@ -39,6 +46,24 @@ class Affiliate extends Model
     public function commissions()
     {
         return $this->hasMany(Commission::class);
+    }
+
+    // Relacionamento com afiliado pai
+    public function parentAffiliate()
+    {
+        return $this->belongsTo(Affiliate::class, 'parent_affiliate_id');
+    }
+
+    // Relacionamento com subafiliados
+    public function subAffiliates()
+    {
+        return $this->hasMany(Affiliate::class, 'parent_affiliate_id');
+    }
+
+    // Subafiliados ativos (que têm pelo menos 1 referral)
+    public function activeSubAffiliates()
+    {
+        return $this->subAffiliates()->whereHas('referrals');
     }
 
     public function getReferralLinkAttribute()
@@ -67,87 +92,5 @@ class Affiliate extends Model
         } while (self::where('affiliate_code', $code)->exists());
 
         return $code;
-    }
-}
-
-// app/Models/Referral.php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Referral extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'affiliate_id',
-        'referred_user_id',
-        'registered_at',
-        'total_losses',
-        'total_deposits',
-        'total_commission'
-    ];
-
-    protected $casts = [
-        'registered_at' => 'datetime',
-        'total_losses' => 'decimal:2',
-        'total_deposits' => 'decimal:2',
-        'total_commission' => 'decimal:2'
-    ];
-
-    public function affiliate()
-    {
-        return $this->belongsTo(Affiliate::class);
-    }
-
-    public function referredUser()
-    {
-        return $this->belongsTo(User::class, 'referred_user_id');
-    }
-
-    public function commissions()
-    {
-        return $this->hasMany(Commission::class);
-    }
-}
-
-// app/Models/Commission.php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Commission extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'affiliate_id',
-        'referral_id',
-        'loss_amount',
-        'deposit_amount',
-        'commission_amount',
-        'status',
-        'game_details',
-        'deposit_details'
-    ];
-
-    protected $casts = [
-        'loss_amount' => 'decimal:2',
-        'deposit_amount' => 'decimal:2',
-        'commission_amount' => 'decimal:2',
-        'game_details' => 'array',
-        'deposit_details' => 'array'
-    ];
-
-    public function affiliate()
-    {
-        return $this->belongsTo(Affiliate::class);
-    }
-
-    public function referral()
-    {
-        return $this->belongsTo(Referral::class);
     }
 }
