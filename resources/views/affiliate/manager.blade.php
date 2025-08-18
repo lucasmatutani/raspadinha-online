@@ -252,6 +252,19 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     }
+    
+    /* Melhorar responsividade dos botões no mobile */
+    .btn-action {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    
+    .btn-action:active {
+        transform: translateY(0);
+        transition: transform 0.1s ease;
+    }
 
     .no-data {
         text-align: center;
@@ -480,6 +493,24 @@
 
         .btn-action {
             justify-content: center;
+            min-height: 44px;
+            min-width: 44px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+        }
+        
+        .mobile-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .mobile-buttons .btn-action {
+            flex: 1;
+            min-width: 120px;
         }
     }
 
@@ -889,13 +920,16 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Função para salvar alterações
         document.querySelectorAll('.btn-save').forEach(button => {
-            button.addEventListener('click', function() {
+            // Adicionar suporte para touch events no mobile
+            const handleSave = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 const affiliateId = this.getAttribute('data-affiliate-id');
                 
                 // Buscar inputs tanto na versão desktop quanto mobile
                 let commissionInput = document.querySelector(`form[data-affiliate-id="${affiliateId}"] .commission-input`);
                 if (!commissionInput) {
-                    commissionInput = document.querySelector(`.commission-mobile-form[data-affiliate-id="${affiliateId}"] .commission-input`);
+                    commissionInput = document.querySelector(`div.commission-mobile-form[data-affiliate-id="${affiliateId}"] .commission-input`);
                 }
                 
                 const statusSelect = document.querySelector(`select.status-toggle[data-affiliate-id="${affiliateId}"]`);
@@ -930,7 +964,12 @@
                         commission_rate: commissionRate
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         // Atualizar status
@@ -948,7 +987,12 @@
                         throw new Error(data.message || 'Erro ao atualizar taxa de comissão');
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         showNotification('Configurações salvas com sucesso!', 'success');
@@ -957,15 +1001,18 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Erro:', error);
-                    showNotification(error.message || 'Erro ao salvar configurações', 'error');
+                    showNotification(error.message || 'Erro ao salvar alterações', 'error');
                 })
                 .finally(() => {
                     // Reabilitar botão
                     this.disabled = false;
                     this.innerHTML = originalText;
                 });
-            });
+            };
+            
+            // Adicionar event listeners para click e touch
+            button.addEventListener('click', handleSave);
+            button.addEventListener('touchstart', handleSave, { passive: false });
         });
         
         // Função para zerar comissões
